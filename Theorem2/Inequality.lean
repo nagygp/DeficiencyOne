@@ -13,7 +13,7 @@ If S is noncollinear and f > 0, then:
 This phase provides the complete proof of these inequalities.
 -/
 
-import FixedPointsPrimePower.Theorem2.Covering
+import Theorem2.Covering
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Nat.Prime
 import Mathlib.Algebra.Order.Field.Basic

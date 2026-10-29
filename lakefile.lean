@@ -11,22 +11,21 @@ package fixedPointsPrimePower {
   -- Add package configuration options here
 }
 
+@[default_target]
 lean_lib FixedPointsPrimePower {
   -- Add library configuration options here
-  roots := #[.]
+  roots := #[`Defs, `MainTheorems, `Section2, `Section3, `Section4, `Theorem1]
   globs := #[
-    "Defs.lean",
-    "MainTheorems.lean", 
-    "Section2.lean",
-    "Section3.lean",
-    "Section4.lean"
+    .one `Defs,
+    .one `MainTheorems,
+    .one `Section2,
+    .one `Section3,
+    .one `Section4,
+    .one `Theorem1,
+    .submodules `Theorem2,
+    .submodules `Theorem3
   ]
 }
 
-@[default_target]
-lean_exe run {
-  root := `Main
-}
-
 -- Dependencies
-require mathlib from git "https://github.com/leanprover-community/mathlib4.git"
+require mathlib from git "https://github.com/leanprover-community/mathlib4.git" @ "v4.35.0"

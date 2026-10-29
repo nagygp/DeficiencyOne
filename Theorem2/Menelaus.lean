@@ -26,7 +26,7 @@ In particular, every value of h_u occurs an even number of times on F when s_u i
 For arbitrary s_u, at most two values occur an odd number of times on F."
 -/
 
-import FixedPointsPrimePower.Theorem2.Normalization
+import Theorem2.Normalization
 import Mathlib.Algebra.Field.Basic
 import Mathlib.Data.Finset.Basic
 

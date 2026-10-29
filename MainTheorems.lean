@@ -4,7 +4,7 @@
 This file contains the three main theorems from the paper by Korchmáros, Nagy, and Szőnyi.
 -/
 
-import FixedPointsPrimePower.Defs
+import Defs
 
 -- Enable universe polymorphism
 set_option autoImplicit false

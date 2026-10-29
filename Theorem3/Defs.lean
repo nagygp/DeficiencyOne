@@ -11,7 +11,7 @@ If f ≥ 4, then every split involution τ ∈ PGL₂(q) sharing a fixed point w
 This theorem strengthens the rigidity results from Section 4.
 -/
 
-import FixedPointsPrimePower.Theorem2.Inequality
+import Theorem2.Inequality
 import Mathlib.Data.Finset.Card
 
 -- Enable universe polymorphism

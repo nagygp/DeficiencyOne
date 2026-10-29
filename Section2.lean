@@ -5,8 +5,8 @@ This file contains the proofs from Section 2 of the paper, which derives the fix
 bound from an interpolating polynomial and its derivative.
 -/
 
-import FixedPointsPrimePower.Defs
-import FixedPointsPrimePower.MainTheorems
+import Defs
+import MainTheorems
 
 -- Enable universe polymorphism
 set_option autoImplicit false

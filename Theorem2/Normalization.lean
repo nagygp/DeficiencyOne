@@ -12,7 +12,7 @@ polynomial interpolation.
 In particular, d(u) ≠ 0 for every u."
 -/
 
-import FixedPointsPrimePower.Theorem2.Defs
+import Theorem2.Defs
 import Mathlib.Algebra.Polynomial.Eval
 import Mathlib.Algebra.Polynomial.Lagrange
 import Mathlib.Data.Fintype.BigOperators

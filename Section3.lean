@@ -5,9 +5,9 @@ This file contains the proofs from Section 3 of the paper, which uses fixed poin
 to cover the nonsplit members of S by lines and prove Theorem 2.
 -/
 
-import FixedPointsPrimePower.Defs
-import FixedPointsPrimePower.MainTheorems
-import FixedPointsPrimePower.Section2
+import Defs
+import MainTheorems
+import Section2
 
 -- Enable universe polymorphism
 set_option autoImplicit false

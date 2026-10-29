@@ -15,7 +15,7 @@ split involution or at least two nonsplit involutions."
 This phase focuses on defining rich lines and proving Lemma 3.3.
 -/
 
-import FixedPointsPrimePower.Theorem2.Parity
+import Theorem2.Parity
 import Mathlib.LinearAlgebra.ProjectiveSpace.Basic
 import Mathlib.Data.Finset.BigOperators
 

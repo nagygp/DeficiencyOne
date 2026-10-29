@@ -17,7 +17,7 @@ The invariant function h_u satisfies:
 This phase focuses on the explicit structure and properties of h_u.
 -/
 
-import FixedPointsPrimePower.Theorem2.Menelaus
+import Theorem2.Menelaus
 import Mathlib.Algebra.Polynomial.Eval
 import Mathlib.Data.Finset.Card
 

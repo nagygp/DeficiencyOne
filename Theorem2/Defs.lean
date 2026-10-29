@@ -12,7 +12,7 @@ If S is noncollinear and f > 0, then:
 Phase 1 focuses on the basic geometric and algebraic structures needed.
 -/
 
-import FixedPointsPrimePower.Defs
+import Defs
 import Mathlib.LinearAlgebra.ProjectiveSpace.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Matrix.Notation

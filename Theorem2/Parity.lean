@@ -18,7 +18,7 @@ This phase uses these properties to:
 3. Set up the framework for the rich lines theory
 -/
 
-import FixedPointsPrimePower.Theorem2.Invariant
+import Theorem2.Invariant
 import Mathlib.Data.Finset.BigOperators
 import Mathlib.Data.Nat.Parity
 

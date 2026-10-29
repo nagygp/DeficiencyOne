@@ -5,10 +5,10 @@ This file contains the proofs from Section 4 of the paper, which proves rigidity
 a projectivity and then the stronger shared-fixed-point bound of Theorem 3.
 -/
 
-import FixedPointsPrimePower.Defs
-import FixedPointsPrimePower.MainTheorems
-import FixedPointsPrimePower.Section2
-import FixedPointsPrimePower.Section3
+import Defs
+import MainTheorems
+import Section2
+import Section3
 
 -- Enable universe polymorphism
 set_option autoImplicit false

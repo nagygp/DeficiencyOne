@@ -18,7 +18,7 @@ If f ≥ 4, then every split involution τ ∈ PGL₂(q) sharing a fixed point w
 - And: |{x : σ(x) = τ(x)}| ≤ (q - 1) / 2
 -/
 
-import FixedPointsPrimePower.Theorem3.Defs
+import Theorem3.Defs
 import Mathlib.Data.Nat.Parity
 
 -- Enable universe polymorphism

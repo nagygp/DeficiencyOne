@@ -14,7 +14,7 @@ This phase uses these results to establish the inequality:
 where t = (q + f - 1) / 2 is the number of nonsplit involutions.
 -/
 
-import FixedPointsPrimePower.Theorem2.RichLines
+import Theorem2.RichLines
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Nat.Prime
 
