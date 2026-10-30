@@ -1,0 +1,22 @@
+# Lean build output
+.scratch/
+.lake/
+*.olean
+*.ilean
+*.trace
+
+# agent scratch: swarm runs, transcripts, trash
+.ultramath/
+.trash/
+
+# excluded from the public repo: third-party PDFs and the source tarball
+attachments/
+*.tar.gz
+
+# python
+__pycache__/
+*.pyc
+
+# editor / OS
+.DS_Store
+.*.swp
