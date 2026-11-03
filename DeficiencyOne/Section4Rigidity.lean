@@ -38,12 +38,6 @@ Lemma 13 is not yet formalized: it is stated in the two-cycle normalization of t
 
 @[expose] public section
 
-/- The `sorry`s below are the intentional, documented placeholders recorded in `README.md`
-(§3: Theorem 11 and Lemma 12; §4: Lemma 14 and Theorems 15, 17). Their `declaration uses
-`sorry`` warnings are switched off here so that the build is clean; delete this option once the
-statements are proved. -/
-set_option warn.sorry false
-
 open Polynomial
 
 namespace PGL2

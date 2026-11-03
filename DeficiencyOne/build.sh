@@ -22,8 +22,8 @@ for f in Defs Section2FixedPointBound AffineModel Section3PositiveFixedGap Secti
   echo "== building DeficiencyOne/$f.lean"
   lean -o "$OUT/DeficiencyOne/$f.olean" "DeficiencyOne/$f.lean"
 done
-# The build is warning-free.  The five intentional `sorry`s (Theorem 11 and Lemma 12 in §3,
-# Lemma 14 and Theorems 15, 17 in §4) have their `declaration uses sorry` warnings switched off
-# in-file by `set_option warn.sorry false`, with a comment at each site; the inventory is in
-# README.md.  Any warning printed here is therefore a real regression.
-echo "== ok (no warnings)"
+# Each file is compiled with the default linter set and emits no warnings except the five
+# intentional `sorry`s (Theorem 11 and Lemma 12 in §3, Lemma 14 and Theorems 15, 17 in §4) —
+# those still print `declaration uses 'sorry'`, on purpose: the inventory is in README.md.
+# Any other warning printed here is a regression.
+echo "== ok (only the five intended 'sorry' warnings)"

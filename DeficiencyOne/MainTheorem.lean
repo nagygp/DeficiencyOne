@@ -61,8 +61,6 @@ Theorem 3). The proofs are assembled from the chapter files as follows.
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open Classical
 
 namespace PGL2
@@ -167,9 +165,9 @@ theorem numFixed_le_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
     omega
   -- Lemma 4
   have hKr : ∃ r : ℕ, 1 ≤ r ∧ Nat.card K = ringChar K ^ r := by
-    haveI : Fact (ringChar K).Prime := ⟨CharP.char_is_prime K (ringChar K)⟩
-    haveI : NeZero (ringChar K) := ⟨(CharP.char_is_prime K (ringChar K)).ne_zero⟩
-    letI := ZMod.algebra K (ringChar K)
+    have : Fact (ringChar K).Prime := ⟨CharP.char_is_prime K (ringChar K)⟩
+    have : NeZero (ringChar K) := ⟨(CharP.char_is_prime K (ringChar K)).ne_zero⟩
+    let := ZMod.algebra K (ringChar K)
     have hfin : Module.Finite (ZMod (ringChar K)) K := Module.Finite.of_finite
     have hcard := Module.natCard_eq_pow_finrank (K := ZMod (ringChar K)) (V := K)
     rw [show Nat.card (ZMod (ringChar K)) = ringChar K by

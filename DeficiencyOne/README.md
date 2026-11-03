@@ -59,10 +59,23 @@ Sorry inventory: **5** — `Defs` 0, §3 2, §4 3, `MainTheorem` 0. §1, §2, th
 file of main results are `sorry`-free. All three main theorems are proved; what remains unproved
 elsewhere is Lemma 12 for Theorem 2 and Theorems 15/17 for Theorem 3.
 
-The build is **warning-free**. The five intentional `sorry`s carry `set_option warn.sorry false`
-in `Section3PositiveFixedGap.lean` and `Section4Rigidity.lean` (with a comment at each site), so
-`./DeficiencyOne/build.sh` prints no warnings or notes; the inventory above is the authoritative
-record, and removing the option when the statements are proved will restore the warnings.
+The build prints **no warnings except the five `declaration uses 'sorry'` ones** for the
+statements listed above as `sorry`; nothing is silenced with `set_option`. Every other linter
+warning the default Lean linter set raises has been fixed in the source — unused section
+variables by `omit … in`, unused binders by naming them `_…`, `haveI`/`letI` over propositions
+by `have`/`let`. Keep it that way: do not add `set_option linter.unusedSectionVars false`,
+`set_option linter.unusedVariables false` or `set_option warn.sorry false` to page warnings
+under the carpet. Two classes remain under Mathlib's *stricter* optional linter set
+(`linter.mathlibStandardSet`), and both need a decision rather than a suppression:
+
+* `linter.unusedFintypeInType` — 27 lemma statements in §3 and 2 in `AffineModel` mention no
+  `[Fintype K]` while their proofs use one. The linter's fix is to weaken these hypotheses to
+  `[Finite K]` and derive `Fintype` from it in the proof, which changes the statements; not
+  done.
+* `linter.style.longFile` — §3 is over 3000 lines against the 1500-line Mathlib guideline;
+  fixing it means splitting the file.
+* `linter.style.openClassical` — both files `open Classical` at file scope, which the linter
+  wants scoped per declaration; §3 needs it for the `Decidable` instances the proofs use.
 
 The three remaining §3 gaps and what they need:
 

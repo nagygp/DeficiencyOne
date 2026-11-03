@@ -7,11 +7,6 @@ import Mathlib
 import DeficiencyOne.Defs
 import RequestProject.Theorem1
 
--- `mul_pow_card` below is a statement about cardinalities only, so the field instances of the
--- enclosing section are unused in it; and instances are introduced with `haveI`, which the style
--- linter would prefer as `have`.
-set_option linter.unusedSectionVars false
-set_option linter.style.haveILetI false
 attribute [local instance] Classical.decEq
 
 /-!
@@ -71,6 +66,7 @@ section Lemma4
 
 variable (p k : ℕ) [CharP K p]
 
+omit [Field K] [Fintype K] [CharP K p] in
 /-- With `|K| = p ^ (k + 1)` one has `p * p ^ k = |K|`. -/
 lemma mul_pow_card (hk : Nat.card K = p ^ (k + 1)) : p * p ^ k = Nat.card K := by
   rw [hk, pow_succ, Nat.mul_comm]
@@ -79,7 +75,7 @@ lemma mul_pow_card (hk : Nat.card K = p ^ (k + 1)) : p * p ^ k = Nat.card K := b
 lemma sum_pow_pow {ι : Type*} (s : Finset ι) (f : ι → K) :
     (∑ i ∈ s, f i) ^ p ^ k = ∑ i ∈ s, (f i) ^ p ^ k := by
   classical
-  haveI : Fact p.Prime := ⟨CharP.char_is_prime K p⟩
+  have : Fact p.Prime := ⟨CharP.char_is_prime K p⟩
   induction s using Finset.induction with
   | empty =>
     rw [Finset.sum_empty, Finset.sum_empty]
@@ -88,6 +84,7 @@ lemma sum_pow_pow {ι : Type*} (s : Finset ι) (f : ι → K) :
     rw [Finset.sum_insert ha, Finset.sum_insert ha,
       add_pow_char_pow (f a) (∑ i ∈ s, f i) p k, ih]
 
+omit [CharP K p] in
 /-- The key exponent identity: for `|K| = p ^ (k + 1)` and every `x : K`,
 `x ^ (j * p ^ k) = x ^ (digitExp p k j)`. -/
 lemma pow_mul_digitExp (hk : Nat.card K = p ^ (k + 1)) (x : K) (j : ℕ) :
@@ -469,6 +466,7 @@ open Polynomial
 
 variable {K : Type*} [Field K] [Fintype K]
 
+omit [Fintype K] in
 /-- For trace-zero `2 × 2` matrices, `M * N + N * M = tr(M * N) • 1`. -/
 lemma anticommutator_of_trace_zero (M N : Matrix (Fin 2) (Fin 2) K)
     (hM : M.trace = 0) (hN : N.trace = 0) :
@@ -485,9 +483,9 @@ lemma anticommutator_of_trace_zero (M N : Matrix (Fin 2) (Fin 2) K)
 /-- In a finite field of odd order, `2 ≠ 0`. -/
 lemma two_ne_zero_of_odd_card (hodd : Odd (Nat.card K)) : (2 : K) ≠ 0 := by
   classical
-  haveI : Fact (ringChar K).Prime := ⟨CharP.char_is_prime K (ringChar K)⟩
-  haveI : NeZero (ringChar K) := ⟨(CharP.char_is_prime K (ringChar K)).ne_zero⟩
-  letI := ZMod.algebra K (ringChar K)
+  have : Fact (ringChar K).Prime := ⟨CharP.char_is_prime K (ringChar K)⟩
+  have : NeZero (ringChar K) := ⟨(CharP.char_is_prime K (ringChar K)).ne_zero⟩
+  let := ZMod.algebra K (ringChar K)
   have hfin : Module.Finite (ZMod (ringChar K)) K := Module.Finite.of_finite
   have hcard := Module.natCard_eq_pow_finrank (K := ZMod (ringChar K)) (V := K)
   have hcardZ : Nat.card (ZMod (ringChar K)) = ringChar K := by
@@ -515,6 +513,7 @@ lemma two_ne_zero_of_odd_card (hodd : Odd (Nat.card K)) : (2 : K) ≠ 0 := by
   rw [hn] at h2dvd
   omega
 
+omit [Fintype K] in
 /-- A nonidentity involution's lift squares to a nonzero scalar matrix. -/
 lemma sq_smul_of_isInvolution {h : PGL2 K} (hh : IsInvolution h) :
     ∃ l : K, l ≠ 0 ∧ (((Quotient.out h : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * ((Quotient.out h : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) =
@@ -554,6 +553,7 @@ lemma sq_smul_of_isInvolution {h : PGL2 K} (hh : IsInvolution h) :
     exact hMdet ((mul_eq_zero.mp hdet2).elim id id)
   exact ⟨(u : K), hune, hsq⟩
 
+omit [Fintype K] in
 /-- If the lifts of `h₁, h₂` differ by a nonzero scalar, then `h₁ = h₂`. -/
 lemma eq_of_lift_eq_smul {h₁ h₂ : PGL2 K} {c : K} (hc : c ≠ 0)
     (h : ((Quotient.out h₂ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) =
@@ -572,6 +572,7 @@ lemma eq_of_lift_eq_smul {h₁ h₂ : PGL2 K} {c : K} (hc : c ≠ 0)
   rw [Matrix.GeneralLinearGroup.center_eq_range_scalar]
   exact ⟨Units.mk0 c hc, rfl⟩
 
+omit [Fintype K] in
 /-- Distinct commuting involutions of `PGL₂(K)` have anticommuting trace-zero lifts. -/
 lemma anticommute_lifts_of_commute {h₁ h₂ : PGL2 K} (hh₁ : IsInvolution h₁)
     (hh₂ : IsInvolution h₂) (hne : h₁ ≠ h₂) (hcomm : h₁ * h₂ = h₂ * h₁) :
@@ -649,6 +650,7 @@ lemma anticommute_lifts_of_commute {h₁ h₂ : PGL2 K} (hh₁ : IsInvolution h�
       exact hM₂det rfl
     exact absurd (eq_of_lift_eq_smul hcz' hM₂) hne.symm
 
+omit [Fintype K] in
 /-- Four pairwise anticommuting invertible trace-zero `2 × 2` matrices cannot exist when
 `2 ≠ 0` in `K`: trace-zero matrices form a 3-dimensional space, so four of them are linearly
 dependent, but anticommutation forces every coefficient of a dependence to vanish. -/

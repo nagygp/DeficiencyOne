@@ -2,7 +2,6 @@ import Mathlib
 import DeficiencyOne.Defs
 import DeficiencyOne.Section2FixedPointBound
 open scoped LinearAlgebra.Projectivization
-open Classical
 open Polynomial
 
 namespace PGL2
@@ -176,7 +175,8 @@ lemma invMat_sq (u c : K) : invMat u c * invMat u c = c • (1 : Matrix (Fin 2) 
 
 /-- The matrix `[[u, c - u²], [1, -u]]` as an element of `GL₂(K)`, when `c ≠ 0`. -/
 noncomputable def invGL (u c : K) (hc : c ≠ 0) : GL (Fin 2) K :=
-  Matrix.GeneralLinearGroup.mkOfDetNeZero (invMat u c) (by rw [invMat_det]; exact neg_ne_zero.mpr hc)
+  Matrix.GeneralLinearGroup.mkOfDetNeZero (invMat u c)
+    (by rw [invMat_det]; exact neg_ne_zero.mpr hc)
 
 /-- The involution `s_u = [[u, c - u²], [1, -u]]` of `PGL₂(K)`, with `c ≠ 0`. -/
 noncomputable def invClass (u c : K) (hc : c ≠ 0) : PGL2 K := (invGL u c hc : PGL2 K)
@@ -243,12 +243,11 @@ structure AffineData (S : Set (PGL2 K)) (σ : Equiv.Perm (P1 K)) where
   /-- the derivative identity `σ(x) = x - d'(x)` of §2 -/
   σ_deriv : ∀ u, sf u = u - (derivative D).eval u
 
-/-- The normal form of `AffineData` does **not** by itself force `d ∘ σ = d`: the structure only
+/- The normal form of `AffineData` does **not** by itself force `d ∘ σ = d`: the structure only
 records that `d` is nowhere zero and interpolated by a polynomial of degree `≤ q - 1`, and
 `sf u = u - d'(u)`. The implication `d(σ u) = d(u)` of Lemma 6 needs the incidence
 identity (1) relating `S` and `σ`, so the statements of Lemmas 6, 7 and Theorem 8 below carry
 `IsAdmissible S`, `IsMissingPerm S σ` and `σ * σ = 1` as explicit hypotheses. -/
-
 
 lemma mkOfDetNeZero_val (A : Matrix (Fin 2) (Fin 2) K) (h : A.det ≠ 0) :
     ((Matrix.GeneralLinearGroup.mkOfDetNeZero A h : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = A :=
@@ -319,13 +318,13 @@ lemma exists_invClass_of_smul_ptInf {s : PGL2 K} (hs : IsInvolution s)
     have hN : (M 1 0)⁻¹ • M = invMat u c := by
       ext i j
       fin_cases i <;> fin_cases j
-      · show (M 1 0)⁻¹ * M 0 0 = u
+      · change (M 1 0)⁻¹ * M 0 0 = u
         rw [h00', mul_comm u (M 1 0), ← mul_assoc, inv_mul_cancel₀ h10, one_mul]
-      · show (M 1 0)⁻¹ * M 0 1 = c - u ^ 2
+      · change (M 1 0)⁻¹ * M 0 1 = c - u ^ 2
         rw [hcdef, div_eq_inv_mul]; ring
-      · show (M 1 0)⁻¹ * M 1 0 = 1
+      · change (M 1 0)⁻¹ * M 1 0 = 1
         exact inv_mul_cancel₀ h10
-      · show (M 1 0)⁻¹ * M 1 1 = -u
+      · change (M 1 0)⁻¹ * M 1 1 = -u
         rw [h11', mul_neg, ← mul_assoc, inv_mul_cancel₀ h10, one_mul]
     have hdetN : ((M 1 0)⁻¹ • M).det ≠ 0 := by
       rw [Matrix.det_smul, Fintype.card_fin]
@@ -335,7 +334,8 @@ lemma exists_invClass_of_smul_ptInf {s : PGL2 K} (hs : IsInvolution s)
       apply hdetN
       rw [hN, invMat_det, hc0, neg_zero]
     refine ⟨c, hc, ?_⟩
-    have hMeq : (Matrix.GeneralLinearGroup.mkOfDetNeZero M hMd : GL (Fin 2) K) = Quotient.out s := by
+    have hMeq : (Matrix.GeneralLinearGroup.mkOfDetNeZero M hMd : GL (Fin 2) K) =
+        Quotient.out s := by
       apply Matrix.GeneralLinearGroup.ext
       intro i j
       rfl
@@ -350,7 +350,7 @@ lemma exists_invClass_of_smul_ptInf {s : PGL2 K} (hs : IsInvolution s)
               apply Matrix.GeneralLinearGroup.ext
               intro i j
               rw [mkOfDetNeZero_val, invGL_coe, hN]
-            show ((Matrix.GeneralLinearGroup.mkOfDetNeZero ((M 1 0)⁻¹ • M) hdetN :
+            change ((Matrix.GeneralLinearGroup.mkOfDetNeZero ((M 1 0)⁻¹ • M) hdetN :
                 GL (Fin 2) K) : PGL2 K) = ((invGL u c hc : GL (Fin 2) K) : PGL2 K)
             rw [hgl]
 
@@ -398,6 +398,7 @@ lemma labelOf_smul {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (hS : IsAdmissibl
     s • (ptInf : P1 K) = ptFin (labelOf hS hσ hinf hs) :=
   (exists_ptFin_smul_ptInf hS hσ hinf hs).choose_spec
 
+omit [Fintype K] in
 /-- Injectivity of the labelling. -/
 lemma label_injective {S : Set (PGL2 K)} (hS : IsAdmissible S) {s t : PGL2 K} (hs : s ∈ S)
     (ht : t ∈ S) (h : s • (ptInf : P1 K) = t • ptInf) : s = t := by
@@ -636,7 +637,8 @@ lemma sigma_deriv [Fintype K] (_hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
     rw [← ptOf_coord (sOf u • ptFin u), hcoord]
     rfl
   -- the sum bijection `{u ≠ x} → {v ≠ sf}`
-  have hsum : ∑ u ∈ Finset.univ.erase x, (u + d u / (x - u)) = ∑ v ∈ Finset.univ.erase (sfOf σ hinf x), v := by
+  have hsum : ∑ u ∈ Finset.univ.erase x, (u + d u / (x - u)) =
+      ∑ v ∈ Finset.univ.erase (sfOf σ hinf x), v := by
     refine Finset.sum_bij (fun u _ => u + d u / (x - u)) ?_ ?_ ?_ ?_
     · intro u hu
       rw [Finset.mem_erase] at hu ⊢
@@ -677,7 +679,6 @@ lemma sigma_deriv [Fintype K] (_hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
       exact ⟨u, by rw [Finset.mem_erase]; exact ⟨hux, Finset.mem_univ _⟩, ptFin_injective hsx⟩
     · intro u hu
       rfl
-
   -- split and evaluate the sums
   rw [Finset.sum_add_distrib] at hsum
   have hsumU : ∑ u ∈ Finset.univ.erase x, u = -x := by
@@ -692,7 +693,8 @@ lemma sigma_deriv [Fintype K] (_hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
       rw [Polynomial.interpPoly_eval hq2 d u]
   have hsumV : ∑ v ∈ Finset.univ.erase (sfOf σ hinf x), v = -(sfOf σ hinf x) := by
     have h0 := Polynomial.sum_univ_eq_zero (K := K) hq3
-    have hsplit := Finset.sum_erase_add (Finset.univ : Finset K) (fun v => v) (Finset.mem_univ (sfOf σ hinf x))
+    have hsplit := Finset.sum_erase_add (Finset.univ : Finset K) (fun v => v)
+      (Finset.mem_univ (sfOf σ hinf x))
     rw [h0] at hsplit
     exact eq_neg_of_add_eq_zero_left hsplit
   rw [hsumU, hsumD, hsumV] at hsum

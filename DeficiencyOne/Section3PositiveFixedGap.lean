@@ -57,15 +57,6 @@ nonsplit elements.
 
 @[expose] public section
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedVariables false
-
-/- The `sorry`s below are the intentional, documented placeholders recorded in `README.md`
-(§3: Theorem 11 and Lemma 12; §4: Lemma 14 and Theorems 15, 17). Their `declaration uses
-`sorry`` warnings are switched off here so that the build is clean; delete this option once the
-statements are proved. -/
-set_option warn.sorry false
-
 open Classical
 open scoped Matrix
 
@@ -81,11 +72,13 @@ def splitPart (S : Set (PGL2 K)) : Set (PGL2 K) := {s ∈ S | IsSplit s}
 /-- The nonsplit elements of `S`. -/
 def nonsplitPart (S : Set (PGL2 K)) : Set (PGL2 K) := {s ∈ S | IsNonsplit s}
 
+omit [Fintype K] in
 /-- The affine coordinate is injective. -/
 lemma coord_injective : Function.Injective (coord (K := K)) := by
   intro a b h
   rw [← ptOf_coord a, ← ptOf_coord b, h]
 
+omit [Fintype K] in
 /-- Fix points are carried along by conjugation: `y` is fixed by `g s g⁻¹` exactly when
 `g⁻¹ • y` is fixed by `s`. -/
 lemma mem_fixPoints_conj {g s : PGL2 K} {y : P1 K} :
@@ -98,6 +91,7 @@ lemma mem_fixPoints_conj {g s : PGL2 K} {y : P1 K} :
   · intro h
     rw [h, ← mul_smul, mul_inv_cancel, one_smul]
 
+omit [Fintype K] in
 /-- Conjugation preserves the number of fixed points. -/
 lemma card_fixPoints_conj (g s : PGL2 K) :
     Nat.card (fixPoints (g * s * g⁻¹)) = Nat.card (fixPoints s) := by
@@ -117,6 +111,7 @@ lemma card_fixPoints_conj (g s : PGL2 K) :
     apply Subtype.ext
     simp only [← mul_smul, inv_mul_cancel, one_smul]
 
+omit [Fintype K] in
 /-- The lift of an involution fixing `∞` is an upper triangular matrix with trace `0` whose
 off-diagonal entry `(0,1)` may be nonzero; consequently the involution acts on the affine line
 as `x ↦ -x - M₁₀/M₀₀`, a reflection with exactly one fixed point, and it fixes `∞` as well. -/
@@ -230,9 +225,9 @@ number of fixed points of the missing permutation, then `2e + f = q + 1`.
 
 Distinct elements of `S` have disjoint fixed-point sets, and a point is fixed by `σ` exactly
 when no element of `S` fixes it, by equation (1); these sets therefore partition `Ω`. -/
-theorem two_mul_card_splitPart_add_numFixed (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
+theorem two_mul_card_splitPart_add_numFixed (hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.card K)
     {S : Set (PGL2 K)} (hS : IsAdmissible S) (hcard : Nat.card S = Nat.card K)
-    {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ) (hσ2 : σ * σ = 1) :
+    {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ) (_hσ2 : σ * σ = 1) :
     2 * Nat.card (splitPart S) + numFixed σ = Nat.card K + 1 := by
   classical
   -- an element of `S` fixing a given point is unique
@@ -303,9 +298,9 @@ theorem two_mul_card_splitPart_add_numFixed (hodd : Odd (Nat.card K)) (hq : 5 �
   exact hcompl
 
 /-- Consequently the number of nonsplit elements of `S` is `t = q - e = (q + f - 1) / 2`. -/
-theorem card_nonsplitPart (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
+theorem card_nonsplitPart (_hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.card K)
     {S : Set (PGL2 K)} (hS : IsAdmissible S) (hcard : Nat.card S = Nat.card K)
-    {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ) (hσ2 : σ * σ = 1) :
+    {σ : Equiv.Perm (P1 K)} (_hσ : IsMissingPerm S σ) (_hσ2 : σ * σ = 1) :
     Nat.card (nonsplitPart S) = Nat.card K - Nat.card (splitPart S) := by
   classical
   have hdisj : Disjoint (splitPart S) (nonsplitPart S) := by
@@ -376,7 +371,7 @@ lemma numFixed_eq_fixedFin_card {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A :
   unfold numFixed
   have hE1 : {y : P1 K // σ y = y} ≃ {c : Option K // σ (ptOf c) = ptOf c} :=
     equivWithTop.subtypeEquiv (fun y => by
-      show (σ y = y) ↔ (σ (ptOf (coord y)) = ptOf (coord y))
+      change (σ y = y) ↔ (σ (ptOf (coord y)) = ptOf (coord y))
       rw [ptOf_coord y])
   have hE2 : {c : Option K // σ (ptOf c) = ptOf c} ≃
       Option {u : K // σ (ptFin u) = ptFin u} := by
@@ -423,6 +418,7 @@ involution of `S` labelled by `v`. The incidence identity (1) says the `s_v(x)`,
 exactly the points other than `σ x`; since `s_x(x) = ∞`, the finite ones are `𝔽_q ∖ {sf x}`, so
 the remaining two products are both `-1` (the product of `c - v` over `v ≠ c`). -/
 
+omit [Fintype K] in
 /-- `sf` is an involution. -/
 lemma sf_sf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (hσ2 : σ * σ = 1) (x : K) : A.sf (A.sf x) = x := by
@@ -436,9 +432,11 @@ lemma sf_sf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
 noncomputable def sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (v : K) : PGL2 K := invClass v (A.d v) (A.d_ne v)
 
+omit [Fintype K] in
 lemma sv_mem {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ) (v : K) :
       sv A v ∈ S := (A.isNormal _).2 ⟨v, rfl⟩
 
+omit [Fintype K] in
 /-- `s_v` sends `∞` to `ptFin v`. -/
 lemma sv_ptInf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ) (v : K) :
       sv A v • (ptInf : P1 K) = ptFin v := by
@@ -446,6 +444,7 @@ lemma sv_ptInf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
   have h : sv A v = ((invGL v (A.d v) (A.d_ne v) : GL (Fin 2) K) : PGL2 K) := rfl
   rw [h, coord_smul_class, coord_ptInf, mobius_invGL_inf, coord_ptFin]
 
+omit [Fintype K] in
 /-- The affine coordinate of `s_v • x`. -/
 lemma coord_sv_smul {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (v x : K) :
@@ -457,7 +456,7 @@ lemma coord_sv_smul {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData 
   · rw [if_neg h, mobius_invGL_fin _ _ _ (A.d_ne v) (Ne.symm h)]
 
 /-- Two distinct elements of `S` cannot agree at a point. -/
-lemma eq_of_smul_eq_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
+lemma eq_of_smul_eq_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (_A : AffineData S σ)
       (hS : IsAdmissible S) (x : P1 K) {s t : PGL2 K} (hs : s ∈ S) (ht : t ∈ S)
       (h : s • x = t • x) : s = t := by
   by_contra hne
@@ -518,6 +517,7 @@ lemma prod_erase_sub_eq_neg_one (c : K) : ∏ v ∈ Finset.univ.erase c, (c - v)
   · intro v _; rfl
 
 
+omit [Fintype K] in
 /-- The labels of the points `s_v(x)`, `v ≠ x`, are exactly `K ∖ {sf x}`: this is the incidence
 identity (1) together with `s_x(x) = ∞`. -/
 lemma label_eq_iff {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
@@ -597,7 +597,7 @@ are constant along the orbits of `σ`, `d(σ(x)) = d(x)`.
 
 The hypotheses `IsAdmissible S`, `IsMissingPerm S σ` and `σ * σ = 1` are those of Theorem 1 and
 are genuinely needed: `AffineData` alone does not tie `d` to `σ`. -/
-theorem cover_menelaus_d (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
+theorem cover_menelaus_d (_hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.card K)
       {S : Set (PGL2 K)} (hS : IsAdmissible S) {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ)
       (hσ2 : σ * σ = 1) (A : AffineData S σ) (u : K) :
       A.d (A.sf u) = A.d u := by
@@ -671,6 +671,7 @@ lemma prod_erase_erase_sub' {c y : K} (hyc : y ≠ c) :
   · intro w _; rfl
 
 
+omit [Fintype K] in
 /-- For `w ≠ a` the Menelaus factor is `(a - w)(b - s_w(a))`. -/
 lemma factor_eq_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {a b w : K} (haw : a ≠ w) :
@@ -681,11 +682,13 @@ lemma factor_eq_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S
   rw [← hc, ← hd]
   ring
 
+omit [Fintype K] in
 /-- Every `s_u` is an involution. -/
 lemma sv_sq {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (hS : IsAdmissible S) (u : K) : sv A u * sv A u = 1 :=
   (hS.1 _ (sv_mem A u)).2
 
+omit [Fintype K] in
 /-- `s_u(a) = b` in affine coordinates. -/
 lemma sv_apply {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {a b u : K} (hau : u ≠ a) (hu : u + A.d u / (a - u) = b) :
@@ -693,6 +696,7 @@ lemma sv_apply {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
   apply coord_injective
   rw [coord_sv_smul A u a, if_neg hau, hu, coord_ptFin]
 
+omit [Fintype K] in
 /-- With `s_u(a) = b` and `a ≠ b`, the label `u` differs from `a`. -/
 lemma ne_a_of_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {a b u : K} (hab : a ≠ b) (hu : u + A.d u / (a - u) = b) : a ≠ u := by
@@ -700,6 +704,7 @@ lemma ne_a_of_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S �
   rw [sub_self, div_zero, add_zero] at hu
   exact hab hu
 
+omit [Fintype K] in
 /-- With `s_u(a) = b` and `a ≠ b`, the label `u` differs from `b`. -/
 lemma ne_b_of_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {a b u : K} (hab : a ≠ b) (hu : u + A.d u / (a - u) = b) : u ≠ b := by
@@ -782,7 +787,7 @@ lemma prod_special {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S
 
 Evaluating `prod_special` at `(a,b)` and at `(b,a)` gives two expressions for the same product,
 and comparing them is exactly the identity. -/
-theorem cover_menelaus_cross (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
+theorem cover_menelaus_cross (_hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.card K)
       {S : Set (PGL2 K)} (hS : IsAdmissible S) {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ)
       (hσ2 : σ * σ = 1) (A : AffineData S σ)
       {a b u : K} (hab : a ≠ b) (hbu : b ≠ A.sf a) (hu : u + A.d u / (a - u) = b) :
@@ -845,19 +850,23 @@ noncomputable def huOmg {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineD
       P1 K → K :=
   fun x => (coord x).elim 1 (fun y => hu A u y)
 
+omit [Fintype K] in
 @[simp] lemma huOmg_ptInf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (u : K) : huOmg A u (ptInf : P1 K) = 1 := by
   simp [huOmg]
 
+omit [Fintype K] in
 @[simp] lemma huOmg_ptFin {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (u y : K) : huOmg A u (ptFin y) = hu A u y := by
   simp [huOmg]
 
+omit [Fintype K] in
 lemma huOmg_of_coord {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {u : K} {x : P1 K} {y : Option K} (h : coord x = y) :
       huOmg A u x = y.elim 1 (fun z => hu A u z) := by
   simp [huOmg, h]
 
+omit [Fintype K] in
 /-- `h_u(u) = 1`, so the extension to `∞` is consistent with `s_u` swapping `u` and `∞`. -/
 lemma hu_self {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ) (u : K) :
       hu A u u = 1 := by
@@ -879,6 +888,7 @@ lemma huOmg_comp_sigma (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
       rw [h1, A.σ_fin, huOmg_ptFin, huOmg_ptFin]
       exact cover_hu_comp_sigma hodd hq hS hσ hσ2 A u y
 
+omit [Fintype K] in
 /-- `s_u` acts on finite points away from its label. -/
 lemma sv_smul_ptFin {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {u y : K} (hyu : y ≠ u) :
@@ -886,6 +896,7 @@ lemma sv_smul_ptFin {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData 
   apply coord_injective
   rw [coord_sv_smul A u y, if_neg (Ne.symm hyu), coord_ptFin]
 
+omit [Fintype K] in
 /-- `s_u` swaps `u` and `∞`. -/
 lemma sv_smul_ptFin_self {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (u : K) : sv A u • ptFin u = (ptInf : P1 K) := by
@@ -1056,6 +1067,7 @@ noncomputable def rho {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineDat
   MvPolynomial.C (A.d c)⁻¹ *
       (MvPolynomial.X 1 - (MvPolynomial.X 0 - MvPolynomial.C c) ^ 2)
 
+omit [Fintype K] in
 /-- Equation (6) of the paper: `ρ_c(u, d(u)) = h_u(c)` for `c ∈ F`. This is where `σ(c) = c`
 enters: `h_u(c)` has the factor `u - σ(c)`, which becomes `u - c`. -/
 lemma rho_eval {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
@@ -1066,6 +1078,7 @@ lemma rho_eval {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
   rw [hu, hc, div_eq_mul_inv, sq]
   ring
 
+omit [Fintype K] in
 /-- `ρ_c` has total degree at most two, so a product of `3f - 6` such factors has degree at most
 `6f - 12`. -/
 lemma rho_totalDegree_le {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
@@ -1085,12 +1098,14 @@ lemma rho_totalDegree_le {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : Affine
           Nat.mul_le_mul_left 2 h2
         _ = 2 := by norm_num
 
+omit [Fintype K] in
 /-- Evaluating `ρ_c` at a point `(u, y)`. -/
 lemma rho_eval_at {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (u y c : K) :
       MvPolynomial.eval ![u, y] (rho A c) = (A.d c)⁻¹ * (y - (u - c) ^ 2) := by
   simp [rho]
 
+omit [Fintype K] in
 /-- `ρ_c - 1 ≠ 0`: the value at `(c, 0)` is `-1`. (The paper compares the coefficient of `Y`.) -/
 lemma rho_sub_one_ne_zero {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (c : K) : rho A c - 1 ≠ 0 := by
@@ -1101,6 +1116,7 @@ lemma rho_sub_one_ne_zero {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : Affin
       zero_sub] at e
   exact one_ne_zero (neg_eq_zero.mp e)
 
+omit [Fintype K] in
 /-- If `ρ_c = ρ_a` then `c = a`. (The paper compares the coefficients of `Y`, giving
 `d(c) = d(a)`, and then of `X`, giving `c = a` since the characteristic is odd.) Evaluating at
 `(c, 0)` delivers both steps at once: it forces `(c - a)² = 0`. -/
@@ -1119,6 +1135,7 @@ lemma rho_eq_rho_imp {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData
 
 /-! ### The fixed points of `s_u` and the fibres of `h_u` over `F` -/
 
+omit [Fintype K] in
 /-- A point fixed by `s_u` is never `∞`, since `s_u` sends `∞` to `ptFin u`. -/
 lemma sv_fix_ne_ptInf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ) (u : K)
       {x : P1 K} (hx : sv A u • x = x) : x ≠ ptInf := by
@@ -1126,6 +1143,7 @@ lemma sv_fix_ne_ptInf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineDat
   rw [h, sv_ptInf] at hx
   exact ptFin_ne_ptInf u hx
 
+omit [Fintype K] in
 /-- A finite fixed point `ptFin y` of `s_u` satisfies `(y - u)² = d(u)`: this is the quadratic
 that limits `s_u` to two fixed points. -/
 lemma sv_fix_quad {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ) (u : K)
@@ -1208,6 +1226,7 @@ lemma card_fibre_at {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData 
 
 /-! ### The involution-plane coordinates of `s_u`, and the lines cut out by Theorem 8 -/
 
+omit [Fintype K] in
 /-- A lift of `invClass u c` is a nonzero scalar multiple of `invMat u c`. -/
 lemma out_invClass_eq_smul (u c : K) (hc : c ≠ 0) :
       ∃ lam : K, lam ≠ 0 ∧ ((Quotient.out (invClass u c hc) : GL (Fin 2) K) :
@@ -1234,6 +1253,7 @@ lemma out_invClass_eq_smul (u c : K) (hc : c ≠ 0) :
       simp [Matrix.GeneralLinearGroup.scalar, Matrix.diagonal, Matrix.mul_apply,
         Matrix.smul_apply, smul_eq_mul]
 
+omit [Fintype K] in
 /-- The involution-plane coordinates of `s_u`: `[u : d(u) - u² : 1]`, up to the scalar coming
 from the chosen representative. -/
 lemma invCoord_invClass (u c : K) (hc : c ≠ 0) :
@@ -1247,6 +1267,7 @@ lemma invCoord_invClass (u c : K) (hc : c ≠ 0) :
   fin_cases i <;>
     simp [Matrix.smul_apply, invMat, smul_eq_mul]
 
+omit [Fintype K] in
 /-- The value of a linear form at `s_u`, read in the coordinates `[u : d(u) - u² : 1]`. -/
 lemma lineForm_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (v : Fin 3 → K) (u : K) :
@@ -1266,13 +1287,15 @@ lemma lineForm_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S 
   rw [hfac, mul_eq_zero]
   simp [hlam]
 
+omit [Fintype K] in
 /-- The factor `ρ_c - 1` of Theorem 8 vanishes at the graph point `(u, d(u))` exactly when `s_u`
 lies on the line of the involution plane with coefficient vector `[2c, 1, -(c² + d(c))]`. -/
 lemma lineForm_v1 {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ) (c u : K) :
       lineForm ![2 * c, (1 : K), -(c ^ 2 + A.d c)] (sv A u) = 0
         ↔ MvPolynomial.eval ![u, A.d u] (rho A c) = 1 := by
   rw [lineForm_sv, rho_eval_at]
-  simp
+  simp only [neg_add_rev, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one, one_mul,
+    Matrix.cons_val]
   constructor
   · intro h
     have h2 : A.d u - (u - c) ^ 2 = A.d c := by linear_combination h
@@ -1285,6 +1308,7 @@ lemma lineForm_v1 {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S 
     linear_combination h2
 
 
+omit [Fintype K] in
 /-- The factor `ρ_c - ρ_{a'}` vanishes at `(u, d(u))` exactly when `s_u` lies on the
 corresponding line. -/
 lemma lineForm_v2 {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
@@ -1568,8 +1592,10 @@ noncomputable def Nmat (v : Fin 3 → K) : Matrix (Fin 2) (Fin 2) K := !![v 0, v
 noncomputable def pair (v : Fin 3 → K) (M : Matrix (Fin 2) (Fin 2) K) : K :=
   v 0 * tz M 0 + v 1 * tz M 1 + v 2 * tz M 2
 
+omit [Fintype K] in
 lemma invCoord_eq_tz (g : PGL2 K) : invCoord g = tz (Quotient.out g : GL (Fin 2) K) := rfl
 
+omit [Fintype K] in
 lemma tz_smul (mu : K) (M : Matrix (Fin 2) (Fin 2) K) : tz (mu • M) = mu • tz M := by
   ext i
   fin_cases i
@@ -1578,20 +1604,24 @@ lemma tz_smul (mu : K) (M : Matrix (Fin 2) (Fin 2) K) : tz (mu • M) = mu • t
   · simp [tz, Matrix.smul_apply, smul_eq_mul]
   · simp [tz, Matrix.smul_apply, smul_eq_mul]
 
+omit [Fintype K] in
 lemma trace_Nmat (v : Fin 3 → K) : (Nmat v).trace = v 0 := by
   simp [Nmat, Matrix.trace_fin_two]
 
+omit [Fintype K] in
 lemma trace_mul_gen (P M : Matrix (Fin 2) (Fin 2) K) :
     (P * M).trace = P 0 0 * M 0 0 + P 0 1 * M 1 0 + P 1 0 * M 0 1 + P 1 1 * M 1 1 := by
   simp only [Matrix.trace_fin_two, Matrix.mul_apply, Fin.sum_univ_two]
   ring
 
+omit [Fintype K] in
 lemma trace_Nmat_mul (v : Fin 3 → K) (M : Matrix (Fin 2) (Fin 2) K) :
     (Nmat v * M).trace = v 0 * M 0 0 + v 1 * M 0 1 + v 2 * M 1 0 := by
   rw [trace_mul_gen]
   simp [Nmat]
   ring
 
+omit [Fintype K] in
 lemma pair_eq_trace (v : Fin 3 → K) (M : Matrix (Fin 2) (Fin 2) K) :
     pair v M = (Nmat v * M).trace - (M.trace / 2) * v 0 := by
   rw [trace_Nmat_mul, div_eq_mul_inv]
@@ -1599,6 +1629,7 @@ lemma pair_eq_trace (v : Fin 3 → K) (M : Matrix (Fin 2) (Fin 2) K) :
     Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
   ring
 
+omit [Fintype K] in
 lemma trace_conj (A : GL (Fin 2) K) (M : Matrix (Fin 2) (Fin 2) K) :
     (((A : Matrix (Fin 2) (Fin 2) K) * M * ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K))).trace
       = M.trace := by
@@ -1610,14 +1641,17 @@ noncomputable def Tmat (A : GL (Fin 2) K) (v : Fin 3 → K) : Fin 3 → K :=
     ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * Nmat v * (A : Matrix (Fin 2) (Fin 2) K)
   ![2 * P 0 0 - v 0, P 1 0, P 0 1]
 
+omit [Fintype K] in
 lemma trace_Tmat (A : GL (Fin 2) K) (v : Fin 3 → K) :
     ((((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * Nmat v
       * (A : Matrix (Fin 2) (Fin 2) K))).trace = v 0 := by
   rw [Matrix.trace_mul_cycle, ← Matrix.GeneralLinearGroup.coe_mul, mul_inv_cancel,
     Matrix.GeneralLinearGroup.coe_one, Matrix.one_mul, trace_Nmat]
 
+omit [Fintype K] in
 lemma trace_conj_gen (X M : Matrix (Fin 2) (Fin 2) K) (A : GL (Fin 2) K) :
-    (X * ((A : Matrix (Fin 2) (Fin 2) K) * M * ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K))).trace
+    (X * ((A : Matrix (Fin 2) (Fin 2) K) * M *
+        ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K))).trace
       = ((((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * X
           * (A : Matrix (Fin 2) (Fin 2) K)) * M).trace := by
   rw [← Matrix.mul_assoc X ((A : Matrix (Fin 2) (Fin 2) K) * M)
@@ -1627,13 +1661,16 @@ lemma trace_conj_gen (X M : Matrix (Fin 2) (Fin 2) K) (A : GL (Fin 2) K) :
     ← Matrix.mul_assoc ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) X
       (A : Matrix (Fin 2) (Fin 2) K)]
 
+omit [Fintype K] in
 lemma pair_Tmat (h2 : (2 : K) ≠ 0) (A : GL (Fin 2) K) (v : Fin 3 → K)
     (M : Matrix (Fin 2) (Fin 2) K) :
     pair (Tmat A v) M =
-      pair v ((A : Matrix (Fin 2) (Fin 2) K) * M * ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)) := by
+      pair v ((A : Matrix (Fin 2) (Fin 2) K) * M *
+        ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)) := by
   have htr := trace_Tmat A v
   set P : Matrix (Fin 2) (Fin 2) K :=
-    ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * Nmat v * (A : Matrix (Fin 2) (Fin 2) K) with hP
+    ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * Nmat v *
+      (A : Matrix (Fin 2) (Fin 2) K) with hP
   have hT : Tmat A v = ![2 * P 0 0 - v 0, P 1 0, P 0 1] := rfl
   set w : Fin 3 → K := ![2 * P 0 0 - v 0, P 1 0, P 0 1] with hw
   have h1 : pair w M = (Nmat w * M).trace - (M.trace / 2) * w 0 := pair_eq_trace w M
@@ -1658,6 +1695,7 @@ lemma pair_Tmat (h2 : (2 : K) ≠ 0) (A : GL (Fin 2) K) (v : Fin 3 → K)
   field_simp
   ring
 
+omit [Fintype K] in
 lemma exists_invCoord_eq_smul_tz {g : PGL2 K} (M : GL (Fin 2) K) (hM : (M : PGL2 K) = g) :
     ∃ mu : K, mu ≠ 0 ∧ invCoord g = mu • tz (M : Matrix (Fin 2) (Fin 2) K) := by
   classical
@@ -1682,6 +1720,7 @@ lemma exists_invCoord_eq_smul_tz {g : PGL2 K} (M : GL (Fin 2) K) (hM : (M : PGL2
   rw [invCoord_eq_tz, ← hs, hmat, scalar_val, Matrix.scalar_apply, hdiag, tz_smul]
 
 
+omit [Fintype K] in
 lemma lineForm_eq_smul_pair {g : PGL2 K} (M : GL (Fin 2) K) (hM : (M : PGL2 K) = g)
     (v : Fin 3 → K) :
     ∃ mu : K, mu ≠ 0 ∧ lineForm v g = mu * pair v (M : Matrix (Fin 2) (Fin 2) K) := by
@@ -1691,14 +1730,17 @@ lemma lineForm_eq_smul_pair {g : PGL2 K} (M : GL (Fin 2) K) (hM : (M : PGL2 K) =
   simp only [Pi.smul_apply, smul_eq_mul, pair]
   ring
 
+omit [Fintype K] in
 lemma conj_mul_inv (A : GL (Fin 2) K) (X : Matrix (Fin 2) (Fin 2) K) :
     (A : Matrix (Fin 2) (Fin 2) K) * (((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) * X
-      * (A : Matrix (Fin 2) (Fin 2) K)) * ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = X := by
+      * (A : Matrix (Fin 2) (Fin 2) K)) *
+      ((A⁻¹ : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = X := by
   simp only [← Matrix.mul_assoc]
   rw [← Matrix.GeneralLinearGroup.coe_mul, mul_inv_cancel, Matrix.GeneralLinearGroup.coe_one,
     Matrix.one_mul, Matrix.mul_assoc, ← Matrix.GeneralLinearGroup.coe_mul, mul_inv_cancel,
     Matrix.GeneralLinearGroup.coe_one, Matrix.mul_one]
 
+omit [Fintype K] in
 lemma pair_kernel {v : Fin 3 → K} (h : ∀ M : Matrix (Fin 2) (Fin 2) K, pair v M = 0) : v = 0 := by
   have h0 := h !![1, 0; 0, -1]
   have h1 := h !![0, 1; 0, 0]
@@ -1710,6 +1752,7 @@ lemma pair_kernel {v : Fin 3 → K} (h : ∀ M : Matrix (Fin 2) (Fin 2) K, pair 
   · simpa using h1
   · simpa using h2
 
+omit [Fintype K] in
 lemma Tmat_ne_zero (h2 : (2 : K) ≠ 0) (A : GL (Fin 2) K) {v : Fin 3 → K} (hv : v ≠ 0) :
     Tmat A v ≠ 0 := by
   intro hT
@@ -1725,6 +1768,7 @@ lemma Tmat_ne_zero (h2 : (2 : K) ≠ 0) (A : GL (Fin 2) K) {v : Fin 3 → K} (hv
   rw [conj_mul_inv] at e
   exact e
 
+omit [Fintype K] in
 lemma lineForm_conj (h2 : (2 : K) ≠ 0) (A : GL (Fin 2) K) (s : PGL2 K) (v : Fin 3 → K) :
     lineForm v ((A : PGL2 K) * s * (A : PGL2 K)⁻¹) = 0 ↔ lineForm (Tmat A v) s = 0 := by
   classical
@@ -1750,6 +1794,7 @@ lemma lineForm_conj (h2 : (2 : K) ≠ 0) (A : GL (Fin 2) K) (s : PGL2 K) (v : Fi
     · exact absurd h hnu
     · rw [h, mul_zero]
 
+omit [Fintype K] in
 /-- Conjugating a set of projective transformations does not change its cardinality. -/
 lemma card_conjSet (g : PGL2 K) (S : Set (PGL2 K)) : Nat.card (conjSet g S) = Nat.card S := by
   have hset : conjSet g S = (fun s => g * s * g⁻¹) '' S := by
@@ -1772,7 +1817,7 @@ that number is positive since `∞` belongs to the fibre, so there is a further 
 `c ∈ E` in the fibre, and `h_u(c) = 1` says exactly that `s_u` lies on `L_c`
 (`lineForm_v1`). -/
 theorem exists_nonsplit_cover_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
-    {S : Set (PGL2 K)} (hS : IsAdmissible S) (hcard : Nat.card S = Nat.card K)
+    {S : Set (PGL2 K)} (hS : IsAdmissible S) (_hcard : Nat.card S = Nat.card K)
     {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ) (hσ2 : σ * σ = 1)
     (A : AffineData S σ) :
     ∃ V : Finset (Fin 3 → K), V.card ≤ numFixed σ - 1 ∧
@@ -1844,6 +1889,7 @@ theorem exists_nonsplit_cover_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ N
       exact one_ne_zero h1
     · exact (lineForm_v1 A c u).2 (by rw [rho_eval A ((mem_fixedFin A).1 hcE)]; exact huc)
 
+omit [Fintype K] in
 lemma isInvolution_conj (g s : PGL2 K) : IsInvolution (g * s * g⁻¹) ↔ IsInvolution s := by
   unfold IsInvolution
   constructor
@@ -1860,13 +1906,14 @@ lemma isInvolution_conj (g s : PGL2 K) : IsInvolution (g * s * g⁻¹) ↔ IsInv
     have h2 : (g * s * g⁻¹) * (g * s * g⁻¹) = g * (s * s) * g⁻¹ := by group
     rw [h2, hsq, mul_one, mul_inv_cancel]
 
+omit [Fintype K] in
 lemma isSplit_conj (g s : PGL2 K) : IsSplit (g * s * g⁻¹) ↔ IsSplit s := by
   unfold IsSplit
   refine and_congr (isInvolution_conj g s) ?_
   constructor
   · rintro ⟨y, hy⟩
     refine ⟨g⁻¹ • y, ?_⟩
-    show s • (g⁻¹ • y) = g⁻¹ • y
+    change s • (g⁻¹ • y) = g⁻¹ • y
     have h2 : g • (s • (g⁻¹ • y)) = y := by
       rw [← conj_smul]
       exact hy
@@ -1874,7 +1921,7 @@ lemma isSplit_conj (g s : PGL2 K) : IsSplit (g * s * g⁻¹) ↔ IsSplit s := by
     rwa [inv_smul_smul] at h3
   · rintro ⟨x, hx⟩
     refine ⟨g • x, ?_⟩
-    show (g * s * g⁻¹) • (g • x) = g • x
+    change (g * s * g⁻¹) • (g • x) = g • x
     rw [conj_smul, inv_smul_smul, hx]
 
 /-- **Proposition 9 of the paper**, nonsplit part, in general: if `f > 0`, the nonsplit elements of
@@ -1911,7 +1958,7 @@ theorem exists_nonsplit_cover (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
     rw [← hg, inv_smul_smul]
   have hinf' : σ' (ptInf : P1 K) = ptInf := by
     rw [hσ'coe]
-    show g • σ (g⁻¹ • ptInf) = ptInf
+    change g • σ (g⁻¹ • ptInf) = ptInf
     rw [hgx, hx, hg]
   have hmiss' : IsMissingPerm (conjSet g S) (σ' : P1 K → P1 K) := by
     rw [hσ'coe]
@@ -2120,7 +2167,7 @@ theorem exists_cover_by_lines (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
       rw [← hg, inv_smul_smul]
     have hinf' : σ' (ptInf : P1 K) = ptInf := by
       rw [hσ'coe]
-      show g • σ (g⁻¹ • ptInf) = ptInf
+      change g • σ (g⁻¹ • ptInf) = ptInf
       rw [hgx, hx, hg]
     have hmiss' : IsMissingPerm (conjSet g S) (σ' : P1 K → P1 K) := by
       rw [hσ'coe]
@@ -2161,6 +2208,7 @@ the involution plane, and transported back along the conjugation of the involuti
 -/
 
 
+omit [Fintype K] in
 /-- Being fixed-point-free is invariant under conjugation. -/
 lemma fixedPointFree_conj (g u : PGL2 K) :
     (∀ x : P1 K, (g * u * g⁻¹) • x ≠ x) ↔ ∀ x : P1 K, u • x ≠ x := by
@@ -2177,6 +2225,7 @@ lemma fixedPointFree_conj (g u : PGL2 K) :
 
 section Transport
 
+omit [Fintype K] in
 /-- **Chunk (1) of Lemma 10.** Conjugation transports the set counted in Lemma 10: for a lift `A`
 of the conjugating element, `s ↦ A⁻¹ s A` is a bijection from the points of the line `v` whose
 product with `R` is fixed-point-free onto the points of the line `Tmat A v` whose product with
@@ -2231,6 +2280,7 @@ noncomputable def diagInv : PGL2 K :=
   ((Matrix.GeneralLinearGroup.mkOfDetNeZero !![(1 : K), 0; 0, -1] (by
     rw [Matrix.det_fin_two]; norm_num)) : PGL2 K)
 
+omit [Fintype K] in
 /-- A nonidentity involution of `ℙ¹` fixing both `∞` and `0` is the normal form `diag(1,-1)`: a
 lift is diagonal (the two coordinate lines are preserved) and its square is a scalar, so its
 diagonal entries are `a` and `-a`. -/
@@ -2263,8 +2313,10 @@ lemma eq_diagInv_of_fixes {s : PGL2 K} (hs : IsInvolution s)
     rcases (div_eq_zero_iff).1 h with h' | h'
     · exact h'
     · exact absurd h' h11
-  have h10' : ((Quotient.out s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) 1 0 = 0 := by simpa [hMdef] using h10
-  have h01' : ((Quotient.out s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) 0 1 = 0 := by simpa [hMdef] using h01
+  have h10' : ((Quotient.out s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) 1 0 = 0 := by
+    simpa [hMdef] using h10
+  have h01' : ((Quotient.out s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) 0 1 = 0 := by
+    simpa [hMdef] using h01
   -- the lift squares to a scalar, so its diagonal entries are opposite
   obtain ⟨l, hl, hsq⟩ := sq_smul_of_isInvolution hs
   have h00 : (M : Matrix (Fin 2) (Fin 2) K) 0 0 ^ 2 = l := by
@@ -2316,7 +2368,7 @@ lemma eq_diagInv_of_fixes {s : PGL2 K} (hs : IsInvolution s)
   have hGL : M = Matrix.GeneralLinearGroup.mkOfDetNeZero
       ((M : Matrix (Fin 2) (Fin 2) K) 0 0 • !![(1 : K), 0; 0, -1]) hdetB := by
     apply Units.ext
-    show (M : Matrix (Fin 2) (Fin 2) K)
+    change (M : Matrix (Fin 2) (Fin 2) K)
       = ((M : Matrix (Fin 2) (Fin 2) K) 0 0 • !![(1 : K), 0; 0, -1])
     exact hMval
   calc s = (M : PGL2 K) := hMs.symm
@@ -2328,6 +2380,7 @@ lemma eq_diagInv_of_fixes {s : PGL2 K} (hs : IsInvolution s)
         rw [class_smul ((M : Matrix (Fin 2) (Fin 2) K) 0 0) h00ne]
         rfl
 
+omit [Fintype K] in
 /-- The affine translation `x ↦ x - c`, which fixes `∞` and sends `c` to `0`. -/
 lemma exists_translate (c : K) :
     ∃ h : PGL2 K, h • ptFin c = ptFin 0 ∧ h • (ptInf : P1 K) = ptInf := by
@@ -2391,6 +2444,7 @@ theorem exists_conj_eq_diag (hodd : Odd (Nat.card K)) {R : PGL2 K} (hR : IsSplit
   rw [← hconj]
   group
 
+omit [Fintype K] in
 lemma Tmat_zero (A : GL (Fin 2) K) : Tmat A 0 = 0 := by
   funext i
   fin_cases i <;>
@@ -2402,7 +2456,7 @@ for the normal form `(diag(1,-1), Tmat A v)`, and the two side conditions `v ≠
 `lineForm v R ≠ 0` correspond. -/
 theorem exists_reduce_diag (hodd : Odd (Nat.card K)) (h2 : (2 : K) ≠ 0) {R : PGL2 K}
     (hR : IsSplit R) (v : Fin 3 → K) :
-    ∃ (A : GL (Fin 2) K) (w : Fin 3 → K),
+    ∃ (_A : GL (Fin 2) K) (w : Fin 3 → K),
       (v ≠ 0 ↔ w ≠ 0) ∧ (lineForm v R ≠ 0 ↔ lineForm w diagInv ≠ 0) ∧
       Nat.card {s : PGL2 K // lineForm v s = 0 ∧ IsInvolution s ∧
           ∀ x : P1 K, (R * s) • x ≠ x}
@@ -2456,6 +2510,7 @@ is a bijection from the involution points of `L` onto the points of `ℙ¹` whos
 * `line_parametrize` : the three statements together.
 -/
 
+omit [Fintype K] in
 /-- The plane point of `diag(1,-1)` is `[1 : 0 : 0]`. -/
 lemma invCoord_diagInv : ∃ lam : K, lam ≠ 0 ∧ invCoord diagInv = lam • ![(1 : K), 0, 0] := by
   classical
@@ -2473,6 +2528,7 @@ lemma invCoord_diagInv : ∃ lam : K, lam ≠ 0 ∧ invCoord diagInv = lam • !
     simp [tz, Matrix.cons_val_zero,
       Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
 
+omit [Fintype K] in
 /-- `L` does not contain `[1 : 0 : 0]` exactly when `v 0 ≠ 0`, i.e. `lineForm v diagInv ≠ 0`. -/
 lemma lineForm_diagInv_iff (v : Fin 3 → K) : lineForm v diagInv = 0 ↔ v 0 = 0 := by
   obtain ⟨lam, hlam, hcoord⟩ := invCoord_diagInv (K := K)
@@ -2489,6 +2545,7 @@ lemma lineForm_diagInv_iff (v : Fin 3 → K) : lineForm v diagInv = 0 ↔ v 0 = 
   · intro h
     rw [h, mul_zero]
 
+omit [Fintype K] in
 /-- `tz` is injective on trace-zero matrices. -/
 lemma tz_injective_on_trace_zero {M N : Matrix (Fin 2) (Fin 2) K} (hM : M.trace = 0)
     (hN : N.trace = 0) (h : tz M = tz N) : M = N := by
@@ -2514,10 +2571,11 @@ lemma tz_injective_on_trace_zero {M N : Matrix (Fin 2) (Fin 2) K} (hM : M.trace 
   ext i j
   fin_cases i <;> fin_cases j <;> simp [e0, e1, e2, e3]
 
+omit [Fintype K] in
 /-- The involution-plane point of an involution determines the involution: the trace-zero
 coordinates are homogeneous coordinates of the class of the trace-zero lift. This is injectivity of
 the parametrization `s ↦ [B(s) : C(s)]`. -/
-lemma invCoord_injOn_involutions (h2 : (2 : K) ≠ 0) {s t : PGL2 K} (hs : IsInvolution s)
+lemma invCoord_injOn_involutions (_h2 : (2 : K) ≠ 0) {s t : PGL2 K} (hs : IsInvolution s)
     (ht : IsInvolution t) {mu : K} (hmu : mu ≠ 0) (h : invCoord t = mu • invCoord s) : t = s := by
   classical
   have hMt : ((Quotient.out t : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K).trace = 0 :=
@@ -2539,7 +2597,7 @@ lemma invCoord_injOn_involutions (h2 : (2 : K) ≠ 0) {s t : PGL2 K} (hs : IsInv
           GL (Fin 2) K) : PGL2 K) := by
         congr 1
         apply Units.ext
-        show ((Quotient.out t : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+        change ((Quotient.out t : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
           = (mu • ((Quotient.out s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K))
         exact hmat
     _ = ((Matrix.GeneralLinearGroup.mkOfDetNeZero
@@ -2556,6 +2614,7 @@ lemma invCoord_injOn_involutions (h2 : (2 : K) ≠ 0) {s t : PGL2 K} (hs : IsInv
         rw [hgl]
         exact Quotient.out_eq s
 
+omit [Fintype K] in
 /-- `invCoord` of the identity is zero (the trace-zero coordinates of a scalar matrix vanish). -/
 lemma invCoord_one_eq_zero (h2 : (2 : K) ≠ 0) : invCoord (1 : PGL2 K) = 0 := by
   obtain ⟨mu, hmu, hcoord⟩ :=
@@ -2563,17 +2622,18 @@ lemma invCoord_one_eq_zero (h2 : (2 : K) ≠ 0) : invCoord (1 : PGL2 K) = 0 := b
   have hz : tz (1 : Matrix (Fin 2) (Fin 2) K) = 0 := by
     funext i
     fin_cases i
-    · show (1 : K) - (1 + 1) / 2 = 0
+    · change (1 : K) - (1 + 1) / 2 = 0
       have hdiv : ((1 : K) + 1) / 2 = 1 := by
         rw [div_eq_iff h2]
         ring
       rw [hdiv, sub_self]
-    · show (1 : Matrix (Fin 2) (Fin 2) K) 0 1 = 0
+    · change (1 : Matrix (Fin 2) (Fin 2) K) 0 1 = 0
       simp
-    · show (1 : Matrix (Fin 2) (Fin 2) K) 1 0 = 0
+    · change (1 : Matrix (Fin 2) (Fin 2) K) 1 0 = 0
       simp
   rw [hcoord, show ((1 : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) = 1 from rfl, hz, smul_zero]
 
+omit [Fintype K] in
 /-- For a line `L` not containing `[1 : 0 : 0]` (`v 0 ≠ 0`), the `(B, C)`-coordinates of an
 involution on `L` are not both zero: otherwise the point would be `[1 : 0 : 0]`. -/
 lemma lineForm_coord_ne_zero (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 0 ≠ 0) {s : PGL2 K}
@@ -2599,6 +2659,7 @@ lemma lineForm_coord_ne_zero (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 0 �
     simpa using h
   exact h0 ((mul_eq_zero.1 hv).resolve_left hv0)
 
+omit [Fintype K] in
 /-- **Chunk (2) of Lemma 10, surjectivity**: every point `[B : C]` of `ℙ¹` whose reconstructed
 `A = -(v₁B + v₂C)/v₀` satisfies `A² + BC ≠ 0` is the projection of an involution on the line. -/
 lemma exists_involution_on_line (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 0 ≠ 0) {B C : K}
@@ -2616,7 +2677,7 @@ lemma exists_involution_on_line (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 
   -- the class of `Z` is an involution, because `Z * Z` is the scalar `A² + BC`
   have htrZ : Z.trace = 0 := by
     rw [hZ, Matrix.trace, Fin.sum_univ_two]
-    show A + -A = 0
+    change A + -A = 0
     ring
   have hZZ : Z * Z = (A ^ 2 + B * C) • (1 : Matrix (Fin 2) (Fin 2) K) := by
     rw [sq_eq_trace_smul_sub_det, htrZ, zero_smul, zero_sub, hZ, Matrix.det_fin_two_of,
@@ -2635,7 +2696,7 @@ lemma exists_involution_on_line (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 
     rw [Subgroup.mem_center_iff]
     intro x
     apply Units.ext
-    show ((x * (g * g) : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
+    change ((x * (g * g) : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
       = ((g * g * x : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
     rw [Matrix.GeneralLinearGroup.coe_mul x (g * g),
       Matrix.GeneralLinearGroup.coe_mul (g * g) x, hgg]
@@ -2682,6 +2743,7 @@ lemma exists_involution_on_line (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 
     ring
   linear_combination mu * hline
 
+omit [Fintype K] in
 /-- **Chunk (2) of Lemma 10: the line `L` is parametrized by `ℙ¹`.** Assume `[1 : 0 : 0] ∉ L`,
 i.e. `v 0 ≠ 0` (`lineForm_diagInv_iff`). Then
 
@@ -2698,9 +2760,9 @@ theorem line_parametrize (h2 : (2 : K) ≠ 0) {v : Fin 3 → K} (hv0 : v 0 ≠ 0
     (∀ B C : K, (-(v 1 * B + v 2 * C) / v 0) ^ 2 + B * C ≠ 0 →
         ∃ (s : PGL2 K) (mu : K), mu ≠ 0 ∧ IsInvolution s ∧ lineForm v s = 0 ∧
           invCoord s = mu • ![-(v 1 * B + v 2 * C) / v 0, B, C]) :=
-  ⟨fun s hs h => lineForm_coord_ne_zero h2 hv0 hs h,
-   fun s t hs ht _ _ h => invCoord_injOn_involutions h2 hs ht h.choose_spec.1 h.choose_spec.2,
-   fun B C h => exists_involution_on_line h2 hv0 h⟩
+  ⟨fun _s hs h => lineForm_coord_ne_zero h2 hv0 hs h,
+   fun _s _t hs ht _ _ h => invCoord_injOn_involutions h2 hs ht h.choose_spec.1 h.choose_spec.2,
+   fun _B _C h => exists_involution_on_line h2 hv0 h⟩
 
 /-! #### Chunk (3) of Lemma 10: fixed points of `diag(1,-1) · s` and the discriminant `-4BC`
 
@@ -2717,6 +2779,7 @@ eigenvector — this gives the paper's dictionary (`exists_fixed_point_diag_mul_
 is a nonsquare in `K`.
 -/
 
+omit [Fintype K] in
 /-- The action of `GL₂` on `K²` is matrix-vector multiplication. -/
 lemma gl_smul_eq_mulVec (g : GL (Fin 2) K) (v : Fin 2 → K) :
     g • v = (g : Matrix (Fin 2) (Fin 2) K) *ᵥ v := by
@@ -2726,6 +2789,7 @@ lemma gl_smul_eq_mulVec (g : GL (Fin 2) K) (v : Fin 2 → K) :
   rw [Matrix.GeneralLinearGroup.coe_toLin]
   rfl
 
+omit [Fintype K] in
 /-- A projective transformation has a fixed point exactly when a lift has an eigenvector. -/
 theorem exists_fixed_point_iff_eigenvector (g : GL (Fin 2) K) :
     (∃ x : P1 K, ((g : PGL2 K)) • x = x) ↔
@@ -2762,11 +2826,14 @@ noncomputable def Dmat (K : Type*) [Field K] : GL (Fin 2) K :=
   Matrix.GeneralLinearGroup.mkOfDetNeZero !![(1 : K), 0; 0, -1] (by
     rw [Matrix.det_fin_two]; norm_num)
 
+omit [Fintype K] in
 lemma diagInv_eq_Dmat : diagInv = (Dmat K : PGL2 K) := rfl
 
+omit [Fintype K] in
 lemma Dmat_val : (Dmat K : Matrix (Fin 2) (Fin 2) K) = !![(1 : K), 0; 0, -1] :=
   mkOfDetNeZero_val _ _
 
+omit [Fintype K] in
 /-- **Chunk (3) of Lemma 10**: for an involution `s` of `ℙ¹` with trace-zero lift `P`, the product
 `diagInv * s` has a fixed point on `ℙ¹(K)` exactly when `-P₀₁ P₁₀` is a square in `K`. -/
 theorem exists_fixed_point_diag_mul_iff {s : PGL2 K} {P : GL (Fin 2) K}
@@ -2843,6 +2910,7 @@ theorem exists_fixed_point_diag_mul_iff {s : PGL2 K} {P : GL (Fin 2) K}
 
 section Four
 
+omit [Fintype K] in
 /-- `4` is a square, so `4 * y` is a square exactly when `y` is (in odd characteristic). -/
 lemma isSquare_four_mul (h2 : (2 : K) ≠ 0) {y : K} : IsSquare (4 * y) ↔ IsSquare y := by
   constructor
@@ -2855,6 +2923,7 @@ lemma isSquare_four_mul (h2 : (2 : K) ≠ 0) {y : K} : IsSquare (4 * y) ↔ IsSq
   · rintro ⟨r, rfl⟩
     exact ⟨2 * r, by ring⟩
 
+omit [Fintype K] in
 /-- **Chunk (3) of Lemma 10**, in the paper's form: the discriminant of the characteristic
 polynomial of the lift of `diagInv * s` is `-4 P₀₁ P₁₀`. -/
 theorem exists_fixed_point_diag_mul_iff_four (h2 : (2 : K) ≠ 0) {s : PGL2 K} {P : GL (Fin 2) K}
@@ -2905,6 +2974,7 @@ lemma two_ne_zero_of_odd (hodd : Odd (Nat.card K)) : (2 : K) ≠ 0 := by
     norm_num
   linear_combination -h1
 
+omit [Fintype K] in
 lemma isSquare_zero' : IsSquare (0 : K) := ⟨0, by simp⟩
 
 lemma card_nonsquare_eq_card_ne_zero_isSquare (hodd : Odd (Nat.card K)) :
@@ -2946,11 +3016,11 @@ lemma card_nonsquare_eq_card_ne_zero_isSquare (hodd : Odd (Nat.card K)) :
       invFun := fun y => ⟨n⁻¹ * y.1, fun hsq => ?_⟩
       left_inv := fun x => by
         apply Subtype.ext
-        show n⁻¹ * (n * x.1) = x.1
+        change n⁻¹ * (n * x.1) = x.1
         rw [← mul_assoc, inv_mul_cancel₀ hn0, one_mul]
       right_inv := fun y => by
         apply Subtype.ext
-        show n * (n⁻¹ * y.1) = y.1
+        change n * (n⁻¹ * y.1) = y.1
         rw [← mul_assoc, mul_inv_cancel₀ hn0, one_mul] }
   have h1 : IsSquare (n * (n⁻¹ * y.1)) := by
     rw [← mul_assoc, mul_inv_cancel₀ hn0, one_mul]
@@ -2985,7 +3055,7 @@ theorem card_nonsquare_neg (hodd : Odd (Nat.card K)) :
     have e := Equiv.sumCompl (fun y : K => IsSquare y)
     have h := Nat.card_congr e
     rw [Nat.card_sum] at h
-    show Nat.card {y : K // IsSquare y} + Nat.card {y : K // ¬ IsSquare y} = Nat.card K
+    change Nat.card {y : K // IsSquare y} + Nat.card {y : K // ¬ IsSquare y} = Nat.card K
     exact h
   have hmain : 2 * Nat.card {x : K // ¬ IsSquare x} = Nat.card K - 1 := by
     have h1 : Nat.card {y : K // IsSquare y} = Nat.card {x : K // ¬ IsSquare x} + 1 := by
@@ -3012,15 +3082,18 @@ def IsNonsquareOpt : Option K → Prop
 The point `[1 : 0]` has `-B*C = 0`, a square, and fails the test. -/
 def IsNonsquareBC (P : P1 K) : Prop := IsNonsquareOpt (coord P)
 
+omit [Fintype K] in
 lemma isNonsquareBC_iff (P : P1 K) :
     IsNonsquareBC P ↔ ∃ t : K, coord P = some t ∧ ¬ IsSquare (-t) := by
   cases h : coord P with
   | none => simp [IsNonsquareBC, IsNonsquareOpt, h]
   | some t => simp [IsNonsquareBC, IsNonsquareOpt, h]
 
+omit [Fintype K] in
 lemma not_isNonsquareBC_ptInf : ¬ IsNonsquareBC (ptInf : P1 K) := by
   simp [IsNonsquareBC, IsNonsquareOpt]
 
+omit [Fintype K] in
 lemma isNonsquareBC_ptFin (t : K) : IsNonsquareBC (ptFin t) ↔ ¬ IsSquare (-t) := by
   simp [IsNonsquareBC, IsNonsquareOpt]
 
@@ -3058,6 +3131,7 @@ end Proj
 
 /-! #### Assembling Lemma 10 from the four chunks -/
 
+omit [Fintype K] in
 /-- Multiplying by a nonzero square does not change whether an element is a square. -/
 lemma isSquare_sq_mul {mu : K} (hmu : mu ≠ 0) (y : K) :
     IsSquare (mu * mu * y) ↔ IsSquare y := by
@@ -3069,6 +3143,7 @@ lemma isSquare_sq_mul {mu : K} (hmu : mu ≠ 0) (y : K) :
   · rintro ⟨r, rfl⟩
     exact ⟨mu * r, by ring⟩
 
+omit [Fintype K] in
 /-- The `(1, 0)`-and `(0, 1)`-coordinates of an involution are the off-diagonal entries of its
 trace-zero lift. -/
 lemma invCoord_one_eq (t : PGL2 K) :
@@ -3076,11 +3151,13 @@ lemma invCoord_one_eq (t : PGL2 K) :
   rw [invCoord_eq_tz]
   rfl
 
+omit [Fintype K] in
 lemma invCoord_two_eq (t : PGL2 K) :
     invCoord t 2 = ((Quotient.out t : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K) 1 0 := by
   rw [invCoord_eq_tz]
   rfl
 
+omit [Fintype K] in
 /-- For a nonzero pair `(b, c)`, the projective point `[b : c]` has `-bc` a nonsquare exactly when
 the ratio `b/c` has `-t` a nonsquare — the two agree because `-bc = -c² (b/c)`. -/
 lemma isNonsquareBC_mk (b c : K) (hbc : b ≠ 0 ∨ c ≠ 0) :
@@ -3115,8 +3192,8 @@ lemma isNonsquareBC_mk (b c : K) (hbc : b ≠ 0 ∨ c ≠ 0) :
 /-- **Assembly of `split_off_line`, normalized case**: for a line `L` through no `[1 : 0 : 0]`
 (`w 0 ≠ 0`), the number of involutions `s` on `L` with `diag(1,-1) · s` fixed-point-free is
 `(q-1)/2`. -/
-theorem split_off_line_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
-    {w : Fin 3 → K} (hw : w ≠ 0) (hw0 : w 0 ≠ 0) :
+theorem split_off_line_normalized (hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.card K)
+    {w : Fin 3 → K} (_hw : w ≠ 0) (hw0 : w 0 ≠ 0) :
     2 * Nat.card {t : PGL2 K // lineForm w t = 0 ∧ IsInvolution t ∧
       ∀ x : P1 K, (diagInv * t) • x ≠ x} = Nat.card K - 1 := by
   classical
@@ -3185,7 +3262,8 @@ theorem split_off_line_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card
             = a * (w 0 * invCoord t' 0) := by
           rw [hB1, hB2] at e1
           linear_combination e1 - a * e2
-        rcases mul_eq_zero.1 (by linear_combination this : w 0 * (invCoord t 0 - a * invCoord t' 0) = 0) with h | h
+        rcases mul_eq_zero.1
+          (by linear_combination this : w 0 * (invCoord t 0 - a * invCoord t' 0) = 0) with h | h
         · exact absurd h hw0
         · linear_combination h
       apply Subtype.ext
@@ -3225,7 +3303,7 @@ theorem split_off_line_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card
           fin_cases i <;> simp
         apply coord_injective
         rw [hcoord]
-        show coord (Projectivization.mk K ![invCoord t 1, invCoord t 2] _) = some u
+        change coord (Projectivization.mk K ![invCoord t 1, invCoord t 2] _) = some u
         rw [coord_mk]
         simp only [coordAux]
         have h0 : (![invCoord t 1, invCoord t 2] : Fin 2 → K) 0 = mu * u := by
@@ -3265,7 +3343,6 @@ theorem split_off_line (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
       {R : PGL2 K} (hR : IsSplit R) {v : Fin 3 → K} (hv : v ≠ 0) (hRv : lineForm v R ≠ 0) :
       2 * Nat.card {s : PGL2 K // lineForm v s = 0 ∧ IsInvolution s ∧
         ∀ x : P1 K, (R * s) • x ≠ x} = Nat.card K - 1 := by
-
   classical
   have h2 : (2 : K) ≠ 0 := two_ne_zero_of_odd hodd
   obtain ⟨A, w, hvw, hRw, hcount⟩ := exists_reduce_diag hodd h2 hR v
