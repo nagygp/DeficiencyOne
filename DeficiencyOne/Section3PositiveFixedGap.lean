@@ -128,7 +128,7 @@ lemma card_fixPoints_of_smul_ptInf {t : PGL2 K} (ht : IsInvolution t)
     exact h.symm
   have h10 : M 1 0 = 0 := by
     by_contra h
-    simp only [mobius, mobiusMat, ← hM, if_neg h] at hnone
+    simp only [mobius, mobiusMat, ← hM, ite_eq_of_neg h] at hnone
     exact absurd hnone (by simp)
   -- the trace vanishes, and invertibility keeps the remaining diagonal entry nonzero
   have htr : M 0 0 + M 1 1 = 0 := by
@@ -147,7 +147,7 @@ lemma card_fixPoints_of_smul_ptInf {t : PGL2 K} (ht : IsInvolution t)
     have hden : M 1 0 * x + M 1 1 ≠ 0 := by
       rw [h10, zero_mul, zero_add, h11']
       exact neg_ne_zero.mpr ha
-    simp only [mobius, mobiusMat, ← hM, if_neg hden]
+    simp only [mobius, mobiusMat, ← hM, ite_eq_of_neg hden]
     rw [h10, zero_mul, zero_add, h11']
   have hcoord : ∀ z : K, coord (t • ptFin z) = some ((M 0 0 * z + M 0 1) / (-(M 0 0))) := by
     intro z
@@ -452,8 +452,8 @@ lemma coord_sv_smul {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData 
   rw [sv, coord_smul_invClass]
   by_cases h : v = x
   · subst h
-    rw [if_pos rfl, mobius_invGL_at]
-  · rw [if_neg h, mobius_invGL_fin _ _ _ (A.d_ne v) (Ne.symm h)]
+    rw [ite_eq_of_pos rfl, mobius_invGL_at]
+  · rw [ite_eq_of_neg h, mobius_invGL_fin _ _ _ (A.d_ne v) (Ne.symm h)]
 
 /-- Two distinct elements of `S` cannot agree at a point. -/
 lemma eq_of_smul_eq_sv {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (_A : AffineData S σ)
@@ -527,7 +527,7 @@ lemma label_eq_iff {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S
   constructor
   · rintro ⟨v, hvx, hvw⟩
     have hc := coord_sv_smul A v x
-    rw [if_neg hvx] at hc
+    rw [ite_eq_of_neg hvx] at hc
     have hpt : sv A v • ptFin x = ptFin w := by
       apply coord_injective
       rw [hc, hvw, coord_ptFin]
@@ -545,9 +545,9 @@ lemma label_eq_iff {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S
     have hc := coord_sv_smul A v x
     rw [hcoord] at hc
     by_cases hvx : v = x
-    · rw [if_pos hvx] at hc
+    · rw [ite_eq_of_pos hvx] at hc
       exact absurd hc (by simp)
-    · rw [if_neg hvx] at hc
+    · rw [ite_eq_of_neg hvx] at hc
       exact ⟨v, hvx, (Option.some.inj hc.symm)⟩
 
 
@@ -580,8 +580,8 @@ lemma prod_menelaus {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData 
         refine coord_injective ?_
         have c₁ := coord_sv_smul A v₁ x
         have c₂ := coord_sv_smul A v₂ x
-        rw [if_neg (Finset.mem_erase.1 h₁).1] at c₁
-        rw [if_neg (Finset.mem_erase.1 h₂).1] at c₂
+        rw [ite_eq_of_neg (Finset.mem_erase.1 h₁).1] at c₁
+        rw [ite_eq_of_neg (Finset.mem_erase.1 h₂).1] at c₂
         rw [c₁, c₂, heq]
       · intro w hw
         obtain ⟨v, hvx, hvw⟩ := (label_eq_iff A hσ x w).2 (Finset.mem_erase.1 hw).1
@@ -694,7 +694,7 @@ lemma sv_apply {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       {a b u : K} (hau : u ≠ a) (hu : u + A.d u / (a - u) = b) :
       sv A u • ptFin a = ptFin b := by
   apply coord_injective
-  rw [coord_sv_smul A u a, if_neg hau, hu, coord_ptFin]
+  rw [coord_sv_smul A u a, ite_eq_of_neg hau, hu, coord_ptFin]
 
 omit [Fintype K] in
 /-- With `s_u(a) = b` and `a ≠ b`, the label `u` differs from `a`. -/
@@ -757,14 +757,14 @@ lemma prod_special {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S
       · intro hcon
         have hpt : sv A w • ptFin a = sv A u • ptFin a := by
           apply coord_injective
-          rw [coord_sv_smul A w a, coord_sv_smul A u a, if_neg hwa, if_neg hua, hcon, hu]
+          rw [coord_sv_smul A w a, coord_sv_smul A u a, ite_eq_of_neg hwa, ite_eq_of_neg hua, hcon, hu]
         exact hwu (sv_smul_injective A hS a hpt)
       · exact (label_eq_iff A hσ a _).1 ⟨w, hwa, rfl⟩
     · intro w₁ h₁ w₂ h₂ heq
       rw [Finset.mem_erase, Finset.mem_erase] at h₁ h₂
       have hpt : sv A w₁ • ptFin a = sv A w₂ • ptFin a := by
         apply coord_injective
-        rw [coord_sv_smul A w₁ a, coord_sv_smul A w₂ a, if_neg h₁.1, if_neg h₂.1]
+        rw [coord_sv_smul A w₁ a, coord_sv_smul A w₂ a, ite_eq_of_neg h₁.1, ite_eq_of_neg h₂.1]
         rw [heq]
       exact sv_smul_injective A hS a hpt
     · intro t ht
@@ -808,7 +808,7 @@ theorem cover_menelaus_cross (_hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.card K)
     rwa [hsa] at h2
   have hu' : u + A.d u / (b - u) = a := by
     have hc := coord_sv_smul A u b
-    rw [if_neg hub] at hc
+    rw [ite_eq_of_neg hub] at hc
     rw [hsb, coord_ptFin] at hc
     exact Option.some.inj hc.symm
   have hI := prod_special A hS hσ hab hbu hu
@@ -894,14 +894,14 @@ lemma sv_smul_ptFin {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData 
       {u y : K} (hyu : y ≠ u) :
       sv A u • ptFin y = ptFin (u + A.d u / (y - u)) := by
   apply coord_injective
-  rw [coord_sv_smul A u y, if_neg (Ne.symm hyu), coord_ptFin]
+  rw [coord_sv_smul A u y, ite_eq_of_neg (Ne.symm hyu), coord_ptFin]
 
 omit [Fintype K] in
 /-- `s_u` swaps `u` and `∞`. -/
 lemma sv_smul_ptFin_self {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (A : AffineData S σ)
       (u : K) : sv A u • ptFin u = (ptInf : P1 K) := by
   apply coord_injective
-  rw [coord_sv_smul A u u, if_pos rfl, coord_ptInf]
+  rw [coord_sv_smul A u u, ite_eq_of_pos rfl, coord_ptInf]
 
 
 /-- `h_u` is invariant under `s_u` as well; on finite points this is the Menelaus identity. -/
@@ -2299,14 +2299,14 @@ lemma eq_diagInv_of_fixes {s : PGL2 K} (hs : IsInvolution s)
     rwa [coord_smul_ptFin, coord_ptFin] at h2
   have h10 : (M : Matrix (Fin 2) (Fin 2) K) 1 0 = 0 := by
     by_contra h
-    rw [mobius, mobiusMat, if_neg h] at hminf
+    rw [mobius, mobiusMat, ite_eq_of_neg h] at hminf
     exact nomatch hminf
   have h11 : (M : Matrix (Fin 2) (Fin 2) K) 1 1 ≠ 0 := by
     intro h
-    rw [mobius, mobiusMat, if_pos (by rw [h10, zero_mul, zero_add]; exact h)] at hm0
+    rw [mobius, mobiusMat, ite_eq_of_pos (by rw [h10, zero_mul, zero_add]; exact h)] at hm0
     exact nomatch hm0
   have h01 : (M : Matrix (Fin 2) (Fin 2) K) 0 1 = 0 := by
-    rw [mobius, mobiusMat, if_neg (by rw [h10, zero_mul, zero_add]; exact h11), h10, zero_mul,
+    rw [mobius, mobiusMat, ite_eq_of_neg (by rw [h10, zero_mul, zero_add]; exact h11), h10, zero_mul,
       zero_add] at hm0
     have h : (M : Matrix (Fin 2) (Fin 2) K) 0 1 / (M : Matrix (Fin 2) (Fin 2) K) 1 1 = 0 := by
       simpa using Option.some.inj hm0
@@ -3040,13 +3040,13 @@ theorem card_nonsquare_neg (hodd : Odd (Nat.card K)) :
         | Sum.inr _ => ⟨0, isSquare_zero'⟩
       left_inv := fun y => by
         by_cases h : y.1 = 0
-        · simp only [dif_pos h]
+        · simp only [dite_eq_of_pos h]
           apply Subtype.ext
           exact h.symm
-        · simp only [dif_neg h]
+        · simp only [dite_eq_of_neg h]
       right_inv := fun s => by
         match s with
-        | Sum.inl y => simp only [dif_neg y.2.1]
+        | Sum.inl y => simp only [dite_eq_of_neg y.2.1]
         | Sum.inr _ => simp }
     rw [Nat.card_congr e, Nat.card_sum]
     simp
@@ -3179,7 +3179,7 @@ lemma isNonsquareBC_mk (b c : K) (hbc : b ≠ 0 ∨ c ≠ 0) :
   rw [IsNonsquareBC, hcoord]
   by_cases hc : c = 0
   · simp [hc, IsNonsquareOpt]
-  · rw [if_neg hc]
+  · rw [ite_eq_of_neg hc]
     simp only [IsNonsquareOpt]
     -- `-b*c = -c²(b/c)`
     have h2 : c * c * (-(b / c)) = -(b * c) := by
@@ -3310,7 +3310,7 @@ theorem split_off_line_normalized (hodd : Odd (Nat.card K)) (_hq : 5 ≤ Nat.car
           rw [hvec]; simp
         have h1 : (![invCoord t 1, invCoord t 2] : Fin 2 → K) 1 = mu := by
           rw [hvec]; simp
-        rw [h0, h1, if_neg hmu]
+        rw [h0, h1, ite_eq_of_neg hmu]
         congr 1
         field_simp
     calc Nat.card {t : PGL2 K // lineForm w t = 0 ∧ IsInvolution t ∧

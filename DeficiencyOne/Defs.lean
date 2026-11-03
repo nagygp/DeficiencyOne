@@ -56,6 +56,29 @@ universe u
 /-- The projective line `ℙ¹(K)` over `K`, as the projectivization of `K²`. -/
 abbrev P1 (K : Type u) [Field K] : Type u := ℙ K (Fin 2 → K)
 
+/-! ### Two `if`-rewrites stated here rather than taken from the library
+
+`if_pos`, `if_neg`, `dif_pos` and `dif_neg` are renamed by upstream Lean after the 4.33.x used
+here (`ite_eq_left`, `ite_eq_right` and the dependent analogues), and the old names are
+deprecated there, so every use warns.  Naming any of the eight spellings in the source therefore
+breaks one toolchain or the other: `ite_eq_left` does not exist in 4.33.x.  These four lemmas
+have the same statements and the same rewrite behaviour, so the proofs work on either version;
+nothing else in the development mentions an `if`-lemma name.
+
+`if`s in this file, in `AffineModel.lean` and in `Section3PositiveFixedGap.lean` are rewritten
+with these instead of `if_pos`, `if_neg`, `dif_pos`, `dif_neg`. -/
+theorem ite_eq_of_pos {c : Prop} [Decidable c] (h : c) {α : Sort*} {t e : α} :
+    (if c then t else e) = t := by simp [h]
+
+theorem ite_eq_of_neg {c : Prop} [Decidable c] (h : ¬ c) {α : Sort*} {t e : α} :
+    (if c then t else e) = e := by simp [h]
+
+theorem dite_eq_of_pos {c : Prop} [Decidable c] (h : c) {α : Sort*} {t : c → α} {e : ¬ c → α} :
+    dite c t e = t h := by simp [h]
+
+theorem dite_eq_of_neg {c : Prop} [Decidable c] (h : ¬ c) {α : Sort*} {t : c → α} {e : ¬ c → α} :
+    dite c t e = e h := by simp [h]
+
 namespace PGL2
 
 variable {K : Type u} [Field K]

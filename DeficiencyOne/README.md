@@ -77,6 +77,14 @@ under the carpet. Two classes remain under Mathlib's *stricter* optional linter 
 * `linter.style.openClassical` — both files `open Classical` at file scope, which the linter
   wants scoped per declaration; §3 needs it for the `Decidable` instances the proofs use.
 
+**Toolchain portability.** The repository pins no `lean-toolchain`, so the toolchain comes from
+whatever Mathlib the build points at, and library names differ between them. Where a name has
+already been renamed upstream, the source does not use either spelling: `Defs.lean` states
+`ite_eq_of_pos`, `ite_eq_of_neg`, `dite_eq_of_pos` and `dite_eq_of_neg` and the files use those,
+because `if_pos`/`dif_pos` warn as deprecated on a newer toolchain while their replacements
+`ite_eq_left`/`ite_eq_right` do not exist on the 4.33.x used here. Follow that pattern for any
+further rename: state the rule once in `Defs.lean`, use it, and mention neither spelling.
+
 The three remaining §3 gaps and what they need:
 
 * `split_off_line` (Lemma 10) — **proved**, from the four chunks below plus

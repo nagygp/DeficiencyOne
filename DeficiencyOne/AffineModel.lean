@@ -45,9 +45,9 @@ lemma coordAux_scale (a b : { v : Fin 2 → K // v ≠ 0 }) (t : K)
   simp only [coordAux]
   by_cases hb : (b : Fin 2 → K) 1 = 0
   · have ha : (a : Fin 2 → K) 1 = 0 := by rw [h1, hb, mul_zero]
-    rw [if_pos ha, if_pos hb]
+    rw [ite_eq_of_pos ha, ite_eq_of_pos hb]
   · have ha : (a : Fin 2 → K) 1 ≠ 0 := by rw [h1]; exact mul_ne_zero ht hb
-    rw [if_neg ha, if_neg hb, h0, h1, mul_div_mul_left _ _ ht]
+    rw [ite_eq_of_neg ha, ite_eq_of_neg hb, h0, h1, mul_div_mul_left _ _ ht]
 
 noncomputable def coord (x : P1 K) : Option K :=
   Projectivization.lift coordAux coordAux_scale x
@@ -57,12 +57,12 @@ noncomputable def coord (x : P1 K) : Option K :=
 
 @[simp] lemma coord_ptFin (x : K) : coord (ptFin x) = some x := by
   simp only [ptFin, coord_mk, coordAux]
-  rw [if_neg (by simp)]
+  rw [ite_eq_of_neg (by simp)]
   simp
 
 @[simp] lemma coord_ptInf : coord (ptInf (K := K)) = none := by
   simp only [ptInf, coord_mk, coordAux]
-  rw [if_pos (show (![1, 0] : Fin 2 → K) 1 = 0 by simp)]
+  rw [ite_eq_of_pos (show (![1, 0] : Fin 2 → K) 1 = 0 by simp)]
 
 noncomputable def ptOf : Option K → P1 K
   | none => ptInf
@@ -78,14 +78,14 @@ lemma ptOf_coord (x : P1 K) : ptOf (coord x) = x := by
     rw [coord_mk]
     simp only [coordAux]
     by_cases h : v 1 = 0
-    · rw [if_pos h]
+    · rw [ite_eq_of_pos h]
       have hv0 : v 0 ≠ 0 := by
         intro h0
         exact hv (by funext i; fin_cases i <;> simp [h, h0])
       refine (Projectivization.mk_eq_mk_iff' K _ _ (by simp) hv).2 ⟨(v 0)⁻¹, ?_⟩
       funext i
       fin_cases i <;> simp [h, inv_mul_cancel₀ hv0]
-    · rw [if_neg h]
+    · rw [ite_eq_of_neg h]
       refine (Projectivization.mk_eq_mk_iff' K _ _ (by simp) hv).2 ⟨(v 1)⁻¹, ?_⟩
       funext i
       fin_cases i <;> simp [h, div_eq_inv_mul]
@@ -120,8 +120,8 @@ lemma coord_smul_ptInf (g : GL (Fin 2) K) :
   rw [ptInf, Projectivization.smul_mk, coord_mk]
   simp only [coordAux, mobius, mobiusMat]
   by_cases h : (g : Matrix (Fin 2) (Fin 2) K) 1 0 = 0
-  · rw [if_pos (by rw [e1]; exact h), if_pos h]
-  · rw [if_neg (by rw [e1]; exact h), if_neg h, e0, e1]
+  · rw [ite_eq_of_pos (by rw [e1]; exact h), ite_eq_of_pos h]
+  · rw [ite_eq_of_neg (by rw [e1]; exact h), ite_eq_of_neg h, e0, e1]
 
 lemma coord_smul_ptFin (g : GL (Fin 2) K) (y : K) :
     coord (g • ptFin y) = mobius g (some y) := by
@@ -139,8 +139,8 @@ lemma coord_smul_ptFin (g : GL (Fin 2) K) (y : K) :
   rw [ptFin, Projectivization.smul_mk, coord_mk]
   simp only [coordAux, mobius, mobiusMat]
   by_cases h : (g : Matrix (Fin 2) (Fin 2) K) 1 0 * y + (g : Matrix (Fin 2) (Fin 2) K) 1 1 = 0
-  · rw [if_pos (by rw [e1]; exact h), if_pos h]
-  · rw [if_neg (by rw [e1]; exact h), if_neg h, e0, e1]
+  · rw [ite_eq_of_pos (by rw [e1]; exact h), ite_eq_of_pos h]
+  · rw [ite_eq_of_neg (by rw [e1]; exact h), ite_eq_of_neg h, e0, e1]
 
 /-- Equivariance of the affine coordinate with respect to the action of `GL₂(K)`. -/
 lemma coord_smul_GL (g : GL (Fin 2) K) (x : P1 K) : coord (g • x) = mobius g (coord x) := by
@@ -205,7 +205,7 @@ lemma mobius_invGL_fin (u c x : K) (hc : c ≠ 0) (hx : x ≠ u) :
   have h10 : (invMat u c) 1 0 = 1 := rfl
   have h11 : (invMat u c) 1 1 = -u := rfl
   simp only [mobius, mobiusMat, invGL_coe, h00, h01, h10, h11]
-  rw [if_neg hcond, one_mul]
+  rw [ite_eq_of_neg hcond, one_mul]
   congr 1
   have hsub : x - u = x + -u := sub_eq_add_neg x u
   have hx' : x + -u ≠ 0 := by simpa using hcond
@@ -303,13 +303,13 @@ lemma exists_invClass_of_smul_ptInf {s : PGL2 K} (hs : IsInvolution s)
     exact h.symm
   simp only [mobius, mobiusMat] at h1 h2
   by_cases h10 : M 1 0 = 0
-  · rw [if_pos h10] at h1
+  · rw [ite_eq_of_pos h10] at h1
     exact absurd h1 (by simp)
-  · rw [if_neg h10] at h1
+  · rw [ite_eq_of_neg h10] at h1
     have h00 : M 0 0 / M 1 0 = u := by simpa using h1
     have hcond : M 1 0 * u + M 1 1 = 0 := by
       by_contra hc
-      rw [if_neg hc] at h2
+      rw [ite_eq_of_neg hc] at h2
       exact absurd h2 (by simp)
     have h00' : M 0 0 = u * M 1 0 := by
       rw [← h00]; field_simp
