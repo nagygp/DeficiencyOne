@@ -91,61 +91,72 @@ cd <repo> && rm -rf .scratch/build && ./DeficiencyOne/build.sh
 `~/mathlib4` is never cleaned (unlike `.scratch/`), so it survives; rebuild the project's own
 `.scratch/build` afterwards, since oleans from a different Mathlib will not match.
 
-## Using Lean 4.33 locally, starting from no Mathlib
+## Local setup that works: Lean 4.33.1, four steps
 
-`build.sh` fetches nothing: every file imports `Mathlib`, so the build needs a Mathlib **built by
-the same Lean** as the `lean` on `PATH`, and it says so and stops if `LEAN_PATH` is unset. The
-one rule everything below serves: `lean`, `Init`, Mathlib and every dependency must come from a
-single toolchain, because an `.olean` records the version *and* commit that produced it
-(`strings -n 3 …/Init.olean | head -3`) and a mismatch is the `incompatible header` error.
+`build.sh` fetches nothing, and every file starts with `import Mathlib`, so a build needs (a) a
+Lean 4.33.1 toolchain and (b) a Mathlib built by that same toolchain on `LEAN_PATH`.  One rule
+behind all of it: `lean`, its `Init`, Mathlib and each dependency must come from a single
+toolchain, because an `.olean` records the version *and* commit that built it; mixing them is the
+`incompatible header` error.
 
-1. **Pin the toolchain.** `elan toolchain install leanprover/lean4:v4.33.1`, then either
-   `elan default leanprover/lean4:v4.33.1` (whole machine) or, better for one repository,
-   `cd <repo> && elan override set leanprover/lean4:v4.33.1`. Confirm with `lean --version`
-   (expect commit `819816b2e0a3bf405af45ae5c7af2491d8f5bee6`). No `lean-toolchain` file is added:
-   the repository deliberately has none.
+The commands below use the checkout `Nextcloud/Progs/MyLEAN/DeficiencyOne`, relative to your home
+directory; if your copy lives elsewhere, substitute that path — `elan override` records the
+choice per directory, so it must be the directory you build in.
 
-2. **Get a Mathlib built by that toolchain.** Any commit whose `lean-toolchain` reads
-   `leanprover/lean4:v4.33.1` will do — the header pins the toolchain, not the sources:
-
-   ```bash
-   git clone https://github.com/leanprover-community/mathlib4.git ~/mathlib4-433
-   cd ~/mathlib4-433
-   for c in $(git rev-list --all -- lean-toolchain | head -60); do
-     [ "$(git show "$c:lean-toolchain" 2>/dev/null)" = "leanprover/lean4:v4.33.1" ] \
-       && { git checkout "$c"; break; }
-   done
-   cat lean-toolchain          # must print leanprover/lean4:v4.33.1
-   lake --version              # must report (Lean version 4.33.1) — this is the toolchain of `lake`
-   lake exe cache get          # prebuilt oleans for exactly this commit; needs network
-   ```
-
-   `lake env` prints the `LEAN_PATH` of `lake`'s **own** toolchain, so if the last line above
-   shows a different Lean, `lean-toolchain` is not what you think it is (a fresh clone of
-   `master` pins whatever Mathlib currently uses, regardless of the directory's name).
-
-3. **Export and build.**
-
-   ```bash
-   export LEAN_PATH="$(cd ~/mathlib4-433 && lake env printenv LEAN_PATH)"
-   cd <repo>
-   rm -rf .scratch/build       # stale oleans carry the old version; always clear on switch
-   ./DeficiencyOne/build.sh    # exit 0 and exactly five `declaration uses 'sorry'` warnings
-   ```
-
-Deterministic variant, if `PATH` or elan shims keep selecting the wrong `lake`:
+### 1. Install Mathlib v4.33.1 in a local directory
 
 ```bash
-export LEAN_PATH="$(~/.elan/toolchains/leanprover--lean4---v4.33.1/bin/lake env printenv LEAN_PATH)"
+elan toolchain install leanprover/lean4:v4.33.1
+cd Nextcloud/Progs/MyLEAN/DeficiencyOne     # this repo only, not the whole machine
+elan override set leanprover/lean4:v4.33.1
+
+git clone https://github.com/leanprover-community/mathlib4.git ~/mathlib4-433
+cd ~/mathlib4-433
+for c in $(git rev-list --all -- lean-toolchain | head -60); do
+  [ "$(git show "$c:lean-toolchain" 2>/dev/null)" = "leanprover/lean4:v4.33.1" ] \
+    && { git checkout "$c"; break; }
+done
+cat lean-toolchain && lake --version        # v4.33.1 in both
+lake exe cache get                          # ~6 GB of prebuilt oleans, needs network
 ```
 
-Consistency check — the two commands must name the same version and commit:
+A clone of `master` pins whatever Mathlib currently uses, so the loop checks out a commit whose
+`lean-toolchain` is `v4.33.1`; `lake --version` must report 4.33.1 as well, since that is the
+toolchain `lake` belongs to.  `lake exe cache get` downloads oleans built for exactly that
+commit — minutes instead of the hours a from-source Mathlib build takes.
+
+### 2. Set the Lean version for the project directory
+
+`elan override` is part of step 1; what it buys you is persistence — the choice is stored in
+elan's own configuration, keyed by directory, so it survives closing the terminal and rebooting,
+and it outranks the global default (`elan show` says which toolchain is active and why).  No
+`lean-toolchain` file is added to the repository, which deliberately has none.
 
 ```bash
-lean --githash
-strings -n 3 ~/.elan/toolchains/leanprover--lean4---v4.33.1/lib/lean/Init.olean | head -3
+cd Nextcloud/Progs/MyLEAN/DeficiencyOne
+elan override set leanprover/lean4:v4.33.1
+lean --version                              # Lean (version 4.33.1, ...)
+elan override unset                         # undo, when you want the global default back
 ```
 
-The sources themselves are toolchain-neutral for the `if` renames: since commit `3b24b14`
-`Defs.lean` states `ite_eq_of_pos`/`ite_eq_of_neg`/`dite_eq_of_pos`/`dite_eq_of_neg` and nothing
-else mentions `if_pos`, `if_neg`, `ite_eq_left` or `ite_eq_right`.
+### 3. Set LEAN_PATH
+
+```bash
+export LEAN_PATH="$(cd ~/mathlib4-433 && lake env printenv LEAN_PATH)"
+```
+
+This must be repeated in every new shell (put it in your shell's rc file to make it automatic).
+`lake env printenv LEAN_PATH` lists the build directory of Mathlib and of each of its dependencies,
+which is why it is asked of the Mathlib checkout rather than written out by hand.
+
+### 4. Build project
+
+```bash
+cd Nextcloud/Progs/MyLEAN/DeficiencyOne
+rm -rf .scratch/build && ELAN_NO_OVERRIDE_NOTICE=1 ./DeficiencyOne/build.sh
+```
+
+`rm -rf .scratch/build` first: those oleans belong to the toolchain that wrote them.
+`ELAN_NO_OVERRIDE_NOTICE=1` just silences elan's per-invocation note that a directory override is
+in force.  Expected result: exit 0, and exactly five `declaration uses 'sorry'` warnings — the
+documented gaps listed in `DeficiencyOne/README.md`.
