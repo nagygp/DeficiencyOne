@@ -24,7 +24,7 @@ variable {K : Type*} [Field K]
 lemma smul_vec_ne_zero (g : GL (Fin 2) K) {x y : K} (h : x ≠ 0 ∨ y ≠ 0) :
     g 0 0 * x + g 0 1 * y ≠ 0 ∨ g 1 0 * x + g 1 1 * y ≠ 0 := by
   by_contra hc
-  push_neg at hc
+  push Not at hc
   have hd := det_ne_zero g
   rcases h with h | h
   · apply h
@@ -93,7 +93,7 @@ lemma prod_slopes (S : Set (PGL2 K)) (hS : IsSharplyTransitive (X := ℙ K (Fin 
     ∏ s ∈ S.toFinset.filter cond, φ s = -1 := by
   apply prod_eq_neg_one_of_bij
   · intro s hs s' hs' h
-    simp only [Finset.coe_filter, Set.mem_toFinset, Set.mem_setOf_eq] at hs hs'
+    simp only [Finset.coe_filter, Set.mem_toFinset, Set.mem_ofPred_eq] at hs hs'
     have h1 := (hchar s hs.1 (φ s) (hφ s hs.2)).1 ⟨hs.2, rfl⟩
     have h2 := (hchar s' hs'.1 (φ s) (hφ s hs.2)).1 ⟨hs'.2, h.symm⟩
     exact hS.unique hs.1 hs'.1 (h1.trans h2.symm)
@@ -147,7 +147,6 @@ theorem eberhard_lemma2 {K : Type*} [Field K] [Fintype K] (S : Set (PGL2 K))
   have P1 := prod_slopes S hS (fun s => A s ≠ 0 ∧ B s ≠ 0) (fun s => A s / B s)
     (fun t => pt 1 (-t)) (fun _ => pt 0 1) (fun s h => div_ne_zero h.1 h.2) (by
       intro s hs t ht
-      beta_reduce
       rw [act s (Or.inl one_ne_zero) (Or.inr one_ne_zero)]
       constructor
       · rintro ⟨⟨ha, hb⟩, rfl⟩; field_simp; ring
@@ -156,11 +155,10 @@ theorem eberhard_lemma2 {K : Type*} [Field K] [Fintype K] (S : Set (PGL2 K))
         have hb : B s ≠ 0 := by
           intro hb; apply hdet s; simp [h', hb]
         refine ⟨⟨by rw [h']; exact mul_ne_zero hb ht, hb⟩, ?_⟩
-        beta_reduce; rw [h']; field_simp)
+        rw [h']; field_simp)
   have P2 := prod_slopes S hS (fun s => B s ≠ 0 ∧ D s ≠ 0) (fun s => B s / D s)
     (fun _ => pt 0 1) (fun t => pt t 1) (fun s h => div_ne_zero h.1 h.2) (by
       intro s hs t ht
-      beta_reduce
       rw [act s zero1 (Or.inr one_ne_zero)]
       constructor
       · rintro ⟨⟨ha, hb⟩, rfl⟩; field_simp; ring
@@ -169,11 +167,10 @@ theorem eberhard_lemma2 {K : Type*} [Field K] [Fintype K] (S : Set (PGL2 K))
         have hd : D s ≠ 0 := by
           intro hd; apply hdet s; simp [h', hd]
         refine ⟨⟨by rw [h']; exact mul_ne_zero hd ht, hd⟩, ?_⟩
-        beta_reduce; rw [h']; field_simp)
+        rw [h']; field_simp)
   have P3 := prod_slopes S hS (fun s => C s ≠ 0 ∧ D s ≠ 0) (fun s => D s / C s)
     (fun t => pt t (-1)) (fun _ => pt 1 0) (fun s h => div_ne_zero h.2 h.1) (by
       intro s hs t ht
-      beta_reduce
       rw [act s (Or.inr (neg_ne_zero.2 one_ne_zero)) one0]
       constructor
       · rintro ⟨⟨ha, hb⟩, rfl⟩; field_simp; ring
@@ -182,11 +179,10 @@ theorem eberhard_lemma2 {K : Type*} [Field K] [Fintype K] (S : Set (PGL2 K))
         have hc : C s ≠ 0 := by
           intro hc; apply hdet s; simp [h', hc]
         refine ⟨⟨hc, by rw [h']; exact mul_ne_zero hc ht⟩, ?_⟩
-        beta_reduce; rw [h']; field_simp)
+        rw [h']; field_simp)
   have P4 := prod_slopes S hS (fun s => A s ≠ 0 ∧ C s ≠ 0) (fun s => C s / A s)
     (fun _ => pt 1 0) (fun t => pt 1 t) (fun s h => div_ne_zero h.2 h.1) (by
       intro s hs t ht
-      beta_reduce
       rw [act s one0 (Or.inl one_ne_zero)]
       constructor
       · rintro ⟨⟨ha, hb⟩, rfl⟩; field_simp; ring
@@ -195,7 +191,7 @@ theorem eberhard_lemma2 {K : Type*} [Field K] [Fintype K] (S : Set (PGL2 K))
         have ha : A s ≠ 0 := by
           intro ha; apply hdet s; simp [h', ha]
         refine ⟨⟨ha, by rw [h']; exact mul_ne_zero ha ht⟩, ?_⟩
-        beta_reduce; rw [h']; field_simp)
+        rw [h']; field_simp)
   rw [Finset.prod_filter] at P1 P2 P3 P4
   have hall := congrArg₂ (· * ·) (congrArg₂ (· * ·) (congrArg₂ (· * ·) P1 P2) P3) P4
   norm_num at hall

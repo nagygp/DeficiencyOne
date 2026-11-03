@@ -61,6 +61,8 @@ Theorem 3). The proofs are assembled from the chapter files as follows.
 
 @[expose] public section
 
+set_option linter.style.haveILetI false
+
 open Classical
 
 namespace PGL2
@@ -72,6 +74,7 @@ variable {K : Type*} [Field K] [Fintype K]
 def conjPermEquiv (g : PGL2 K) (σ : Equiv.Perm (P1 K)) : Equiv.Perm (P1 K) :=
   MulAction.toPerm g * σ * (MulAction.toPerm g)⁻¹
 
+omit [Fintype K] in
 lemma conjPermEquiv_coe (g : PGL2 K) (σ : Equiv.Perm (P1 K)) :
     ⇑(conjPermEquiv g σ) = conjPerm g σ := by
   funext y
@@ -173,7 +176,7 @@ theorem numFixed_le_normalized (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
       rw [Nat.card_eq_fintype_card, ZMod.card]] at hcard
     refine ⟨Module.finrank (ZMod (ringChar K)) K, ?_, hcard⟩
     by_contra h
-    push_neg at h
+    push Not at h
     have h0 : Module.finrank (ZMod (ringChar K)) K = 0 := by omega
     rw [h0, pow_zero] at hcard
     have h2 : 1 < Nat.card K := by

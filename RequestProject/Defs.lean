@@ -54,7 +54,7 @@ lemma center_le_ker_toPerm :
     rw [Projectivization.mk_eq_mk_iff]
     refine ⟨c, ?_⟩
     ext i
-    simp [Units.smul_def, Matrix.GeneralLinearGroup.scalar, Matrix.diagonal_apply]
+    simp [Units.smul_def, Matrix.GeneralLinearGroup.scalar]
 
 /-- The action of `PGL₂(K)` on the projective line, as a homomorphism into permutations. -/
 def toPerm : PGL2 K →* Equiv.Perm (ℙ K (Fin 2 → K)) :=

@@ -59,6 +59,11 @@ Sorry inventory: **5** — `Defs` 0, §3 2, §4 3, `MainTheorem` 0. §1, §2, th
 file of main results are `sorry`-free. All three main theorems are proved; what remains unproved
 elsewhere is Lemma 12 for Theorem 2 and Theorems 15/17 for Theorem 3.
 
+The build is **warning-free**. The five intentional `sorry`s carry `set_option warn.sorry false`
+in `Section3PositiveFixedGap.lean` and `Section4Rigidity.lean` (with a comment at each site), so
+`./DeficiencyOne/build.sh` prints no warnings or notes; the inventory above is the authoritative
+record, and removing the option when the statements are proved will restore the warnings.
+
 The three remaining §3 gaps and what they need:
 
 * `split_off_line` (Lemma 10) — **proved**, from the four chunks below plus

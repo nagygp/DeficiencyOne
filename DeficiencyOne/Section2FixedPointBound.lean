@@ -480,7 +480,7 @@ lemma anticommutator_of_trace_zero (M N : Matrix (Fin 2) (Fin 2) K)
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.add_apply, Matrix.trace_fin_two,
-      Matrix.one_apply, Matrix.smul_apply] <;> rw [hM', hN'] <;> ring
+      Matrix.smul_apply] <;> rw [hM', hN'] <;> ring
 
 /-- In a finite field of odd order, `2 ≠ 0`. -/
 lemma two_ne_zero_of_odd_card (hodd : Odd (Nat.card K)) : (2 : K) ≠ 0 := by
@@ -504,7 +504,7 @@ lemma two_ne_zero_of_odd_card (hodd : Odd (Nat.card K)) : (2 : K) ≠ 0 := by
   have hcard2 : Nat.card K = 2 ^ r := by rw [hcard', hpeq]
   have hfr : 1 ≤ r := by
     by_contra h
-    push_neg at h
+    push Not at h
     have h0 : r = 0 := by omega
     rw [h0, pow_zero] at hcard2
     have h1 : 1 < Nat.card K := by rw [Nat.card_eq_fintype_card]; exact Fintype.one_lt_card
@@ -567,8 +567,7 @@ lemma eq_of_lift_eq_smul {h₁ h₂ : PGL2 K} {c : K} (hc : c ≠ 0)
     apply Matrix.GeneralLinearGroup.ext
     intro i j
     rw [Matrix.GeneralLinearGroup.coe_mul, hval, h]
-    simp [Matrix.scalar, Matrix.diagonal, Matrix.smul_apply, Matrix.mul_apply, Fin.sum_univ_two,
-      smul_eq_mul]
+    simp [Matrix.scalar, Matrix.diagonal, Matrix.smul_apply, Matrix.mul_apply]
   rw [hGL, mul_div_cancel_right]
   rw [Matrix.GeneralLinearGroup.center_eq_range_scalar]
   exact ⟨Units.mk0 c hc, rfl⟩

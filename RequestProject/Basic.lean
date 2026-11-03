@@ -66,16 +66,16 @@ lemma smul_pt (g : GL (Fin 2) K) {x y : K} (h : x ≠ 0 ∨ y ≠ 0) :
   have hv : (![g 0 0 * x + g 0 1 * y, g 1 0 * x + g 1 1 * y] : Fin 2 → K) ≠ 0 := by
     have := (smul_ne_zero_iff_ne g).mpr (vec_ne_zero h)
     convert this using 1
-    ext i; fin_cases i <;> simp [Units.smul_def, Fin.sum_univ_two]
+    ext i; fin_cases i <;> simp [Units.smul_def]
   rw [pt_eq_mk (vec_ne_zero h), pt_eq_mk hv, Projectivization.smul_mk]
   congr 1
-  ext i; fin_cases i <;> simp [Units.smul_def, Fin.sum_univ_two]
+  ext i; fin_cases i <;> simp [Units.smul_def]
 
 lemma pt_surj (p : ℙ K (Fin 2 → K)) : ∃ x y : K, (x ≠ 0 ∨ y ≠ 0) ∧ p = pt x y := by
   induction p using Projectivization.ind with
   | h v hv =>
     have hxy : v 0 ≠ 0 ∨ v 1 ≠ 0 := by
-      by_contra hc; push_neg at hc
+      by_contra hc; push Not at hc
       exact hv (by ext i; fin_cases i <;> simp [hc])
     refine ⟨v 0, v 1, hxy, ?_⟩
     rw [pt_eq_mk (vec_ne_zero hxy)]

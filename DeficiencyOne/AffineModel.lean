@@ -26,7 +26,9 @@ lemma ptFin_injective : Function.Injective (ptFin (K := K)) := by
 lemma ptFin_ne_ptInf (x : K) : ptFin x ≠ ptInf := by
   intro h
   obtain ⟨a, ha⟩ := (Projectivization.mk_eq_mk_iff' K _ _ (by simp) (by simp)).1 h
-  have h1 : a * 0 = 1 := by have := congrFun ha 1; simpa using this
+  have h1 : a * 0 = 1 := by
+    have h1' := congrFun ha 1
+    simp at h1'
   simp at h1
 
 noncomputable def coordAux (v : { v : Fin 2 → K // v ≠ 0 }) : Option K :=
@@ -87,7 +89,7 @@ lemma ptOf_coord (x : P1 K) : ptOf (coord x) = x := by
     · rw [if_neg h]
       refine (Projectivization.mk_eq_mk_iff' K _ _ (by simp) hv).2 ⟨(v 1)⁻¹, ?_⟩
       funext i
-      fin_cases i <;> simp [h, inv_mul_cancel₀ h, div_eq_inv_mul]
+      fin_cases i <;> simp [h, div_eq_inv_mul]
 
 noncomputable def equivWithTop : P1 K ≃ Option K where
   toFun := coord
@@ -113,9 +115,9 @@ lemma coord_smul_ptInf (g : GL (Fin 2) K) :
     rw [← mul_smul, inv_mul_cancel, one_smul, smul_zero] at h2
     exact (by simp : (![1, 0] : Fin 2 → K) ≠ 0) h2
   have e0 : (g • (![1, 0] : Fin 2 → K)) 0 = (g : Matrix (Fin 2) (Fin 2) K) 0 0 := by
-    simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+    simp
   have e1 : (g • (![1, 0] : Fin 2 → K)) 1 = (g : Matrix (Fin 2) (Fin 2) K) 1 0 := by
-    simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+    simp
   rw [ptInf, Projectivization.smul_mk, coord_mk]
   simp only [coordAux, mobius, mobiusMat]
   by_cases h : (g : Matrix (Fin 2) (Fin 2) K) 1 0 = 0
@@ -131,10 +133,10 @@ lemma coord_smul_ptFin (g : GL (Fin 2) K) (y : K) :
     exact (by simp : (![y, 1] : Fin 2 → K) ≠ 0) h2
   have e0 : (g • (![y, 1] : Fin 2 → K)) 0 =
       (g : Matrix (Fin 2) (Fin 2) K) 0 0 * y + (g : Matrix (Fin 2) (Fin 2) K) 0 1 := by
-    simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+    simp
   have e1 : (g • (![y, 1] : Fin 2 → K)) 1 =
       (g : Matrix (Fin 2) (Fin 2) K) 1 0 * y + (g : Matrix (Fin 2) (Fin 2) K) 1 1 := by
-    simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+    simp
   rw [ptFin, Projectivization.smul_mk, coord_mk]
   simp only [coordAux, mobius, mobiusMat]
   by_cases h : (g : Matrix (Fin 2) (Fin 2) K) 1 0 * y + (g : Matrix (Fin 2) (Fin 2) K) 1 1 = 0
@@ -272,7 +274,7 @@ lemma class_smul (lam : K) (hlam : lam ≠ 0) (A : Matrix (Fin 2) (Fin 2) K) (hA
     apply Matrix.GeneralLinearGroup.ext
     intro i j
     rw [Matrix.GeneralLinearGroup.coe_mul, mkOfDetNeZero_val, mkOfDetNeZero_val, scalar_val]
-    simp [Matrix.smul_apply, smul_eq_mul, Matrix.scalar, Matrix.diagonal_apply, apply_ite]
+    simp [Matrix.smul_apply, Matrix.scalar]
   rw [hBC]
   simp only [QuotientGroup.mk_mul, hscalar, one_mul]
 
@@ -300,7 +302,7 @@ lemma exists_invClass_of_smul_ptInf {s : PGL2 K} (hs : IsInvolution s)
     have h := coord_smul s (ptFin u)
     rw [hsu, coord_ptInf, coord_ptFin] at h
     exact h.symm
-  simp only [mobius, mobiusMat, hM] at h1 h2
+  simp only [mobius, mobiusMat] at h1 h2
   by_cases h10 : M 1 0 = 0
   · rw [if_pos h10] at h1
     exact absurd h1 (by simp)
@@ -358,14 +360,16 @@ variable [Fintype K]
 
 /-! ### The labelling bijection `S ≃ K` -/
 
+omit [Fintype K] in
 /-- Under `σ(∞) = ∞`, no element of `S` fixes `∞`. -/
-lemma smul_ptInf_ne_ptInf {S : Set (PGL2 K)} (hS : IsAdmissible S) {σ : Equiv.Perm (P1 K)}
+lemma smul_ptInf_ne_ptInf {S : Set (PGL2 K)} (_hS : IsAdmissible S) {σ : Equiv.Perm (P1 K)}
     (hσ : IsMissingPerm S σ) (hinf : σ (ptInf : P1 K) = ptInf) {s : PGL2 K} (hs : s ∈ S) :
     s • (ptInf : P1 K) ≠ ptInf := by
   have h := (hσ (ptInf : P1 K) (s • ptInf)).1 ⟨s, hs, rfl⟩
   rw [hinf] at h
   exact h
 
+omit [Fintype K] in
 /-- Every element of `S` sends `∞` to a finite point `[u : 1]`. -/
 lemma exists_ptFin_smul_ptInf {S : Set (PGL2 K)} (hS : IsAdmissible S)
     {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ) (hinf : σ (ptInf : P1 K) = ptInf)
@@ -387,6 +391,7 @@ noncomputable def labelOf {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (hS : IsAd
     (hinf : σ (ptInf : P1 K) = ptInf) {s : PGL2 K} (hs : s ∈ S) : K :=
   (exists_ptFin_smul_ptInf hS hσ hinf hs).choose
 
+omit [Fintype K] in
 lemma labelOf_smul {S : Set (PGL2 K)} {σ : Equiv.Perm (P1 K)} (hS : IsAdmissible S)
     (hσ : IsMissingPerm S σ)
     (hinf : σ (ptInf : P1 K) = ptInf) {s : PGL2 K} (hs : s ∈ S) :
@@ -492,7 +497,7 @@ lemma numFixed_conjPerm (g : PGL2 K) (σ : P1 K → P1 K) :
   unfold numFixed conjPerm
   refine Nat.card_congr (Equiv.subtypeEquiv (MulAction.toPerm g⁻¹) ?_)
   intro y
-  simp only [MulAction.toPerm_apply, Equiv.Perm.coe_inv]
+  simp only [MulAction.toPerm_apply]
   constructor
   · intro h
     have := congrArg (fun z => g⁻¹ • z) h
@@ -595,7 +600,7 @@ lemma eq_of_smul_eq {S : Set (PGL2 K)} (hS : IsAdmissible S) {s t : PGL2 K} (hs 
   exact hcon hfix
 
 /-- **The derivative identity of §2**: `σ(x) = x - d'(x)` on the affine line. -/
-lemma sigma_deriv [Fintype K] (hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
+lemma sigma_deriv [Fintype K] (_hodd : Odd (Nat.card K)) (hq : 5 ≤ Nat.card K)
     {S : Set (PGL2 K)} (hS : IsAdmissible S) (hcard : Nat.card S = Nat.card K)
     {σ : Equiv.Perm (P1 K)} (hσ : IsMissingPerm S σ) (hinf : σ (ptInf : P1 K) = ptInf)
     {d : K → K} (hd : ∀ u, d u ≠ 0)

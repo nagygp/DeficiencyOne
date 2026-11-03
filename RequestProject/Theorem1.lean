@@ -223,10 +223,10 @@ lemma mul_mem_of_isSharplyTransitive (S : Set (PGL2 K))
     have := hkx x
     rw [hx, smul_inv_smul] at this
     exact fpf g hg hg1 x this.symm
-  haveI : Nonempty (ℙ K (Fin 2 → K)) := ⟨pt 1 0⟩
+  have : Nonempty (ℙ K (Fin 2 → K)) := ⟨pt 1 0⟩
   obtain ⟨x, y, hxy, hk_eq⟩ : ∃ x y, x ≠ y ∧ k x = k y := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     let f : ℙ K (Fin 2 → K) → ↥(S \ {h}) := fun x => ⟨k x, hkS x, hkh x⟩
     have hf : Function.Injective f := fun x y hfxy => by
       by_contra hne
@@ -234,7 +234,7 @@ lemma mul_mem_of_isSharplyTransitive (S : Set (PGL2 K))
     have c1 := Nat.card_le_card_of_injective f hf
     have c2 : Nat.card ↥(S \ {h}) < Nat.card S := by
       rw [Nat.card_coe_set_eq, Nat.card_coe_set_eq]
-      exact Set.ncard_diff_singleton_lt_of_mem hh (Set.toFinite S)
+      exact Set.ncard_sdiff_singleton_lt_of_mem hh (Set.toFinite S)
     have c3 := hS.card_eq
     omega
   have hx := hkx x

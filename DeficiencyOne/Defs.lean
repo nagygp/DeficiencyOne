@@ -129,7 +129,7 @@ lemma sq_eq_trace_smul_sub_det (M : Matrix (Fin 2) (Fin 2) K) :
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.trace_fin_two, Matrix.det_fin_two,
-      Matrix.one_apply, Matrix.smul_apply, Matrix.sub_apply] <;> ring
+      Matrix.smul_apply, Matrix.sub_apply] <;> ring
 
 /-- A nonidentity involution of `PGL₂(K)` has trace-zero matrix representative `Quotient.out h`:
 its square is a nonzero scalar, and Cayley–Hamilton forces the trace to vanish. -/
@@ -189,7 +189,7 @@ lemma trace_zero_of_isInvolution {h : PGL2 K} (hh : IsInvolution h) :
     rw [← hM, hMscalar]
     ext i j
     fin_cases i <;> fin_cases j <;>
-      simp [Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply, Fin.sum_univ_two, smul_eq_mul] <;>
+      simp [Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul] <;>
       ring
   have hgcenter : g ∈ Subgroup.center (GL (Fin 2) K) := by
     rw [Subgroup.mem_center_iff]
@@ -206,7 +206,7 @@ lemma trace_zero_of_isInvolution {h : PGL2 K} (hh : IsInvolution h) :
 `[A : B : C]`: a nonzero vector with `A² + BC ≠ 0`, i.e. a point off the conic `Q = 0` of the
 involution plane `Q(U, V, W) = U² + VW`. (The condition `A² + BC = -det M ≠ 0` is exactly
 invertibility of the matrix.) -/
-lemma invCoord_normalized (h2 : (2 : K) ≠ 0) {s : PGL2 K} (hs : IsInvolution s) :
+lemma invCoord_normalized (_h2 : (2 : K) ≠ 0) {s : PGL2 K} (hs : IsInvolution s) :
     invCoord s ≠ 0 ∧ (invCoord s 0) ^ 2 + (invCoord s 1) * (invCoord s 2) ≠ 0 := by
   classical
   set M : Matrix (Fin 2) (Fin 2) K := ((Quotient.out s : GL (Fin 2) K) : Matrix (Fin 2) (Fin 2) K)
@@ -377,6 +377,7 @@ lemma even_card_of_involutive_no_fixed {X : Type*} [Fintype X] (g : X → X)
   rw [← Finset.card_univ, hmain]
   exact ⟨_, by rw [mul_comm, two_mul]⟩
 
+omit [Fintype K] in
 /-- The missing permutation is unique: if `σ` and `τ` both satisfy (1), they agree everywhere,
 since `σ x` (respectively `τ x`) is the unique point not of the form `s • x`, `s ∈ S`. -/
 lemma eq_of_isMissingPerm {S : Set (PGL2 K)} {σ τ : P1 K → P1 K}
